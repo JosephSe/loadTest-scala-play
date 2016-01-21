@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Request>
+    <Source>
+        <RequestorID Password="FROZ6CAG3N" Client="1375" EMailAddress="xml@getaroom.com"></RequestorID>
+        <RequestorPreferences Language="en">
+            <RequestMode>SYNCHRONOUS</RequestMode>
+        </RequestorPreferences>
+    </Source>
+    <RequestDetails>
+        <SearchHotelPriceRequest>
+            <ItemDestination DestinationType="city" DestinationCode="OSL"></ItemDestination>
+            <ImmediateConfirmationOnly></ImmediateConfirmationOnly>
+            <PeriodOfStay>
+                <CheckInDate>2016-01-22</CheckInDate>
+                <Duration>6</Duration>
+            </PeriodOfStay>
+            <IncludePriceBreakdown></IncludePriceBreakdown>
+            <IncludeChargeConditions></IncludeChargeConditions>
+            <Rooms>
+                <Room Code="TB" NumberOfRooms="1"></Room>
+            </Rooms>
+        </SearchHotelPriceRequest>
+    </RequestDetails>
+</Request>
