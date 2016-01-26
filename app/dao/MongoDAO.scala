@@ -9,7 +9,7 @@ import scala.concurrent.Future
 trait CRUDService[E, ID] {
   def findById(id: ID): Future[Option[E]]
 
-  def findByCriteria(criteria: Map[String, Any], limit: Int): Future[Traversable[E]]
+  def findByCriteria(criteria: Map[String, Any], limit: Int): Future[List[E]]
 
   def create(entity: E): Future[Either[String, ID]]
 
@@ -41,10 +41,10 @@ abstract class MongoCRUDService[E: Format, ID: Format](implicit identity: Identi
     find(Json.obj(identity.name -> id)).
     one[E]
 
-  override def findByCriteria(criteria: Map[String, Any], limit: Int): Future[Traversable[E]] =
+  override def findByCriteria(criteria: Map[String, Any], limit: Int): Future[List[E]] =
     findByCriteria(CriteriaJSONWriter.writes(criteria), limit)
 
-  private def findByCriteria(criteria: JsObject, limit: Int): Future[Traversable[E]] =
+  private def findByCriteria(criteria: JsObject, limit: Int): Future[List[E]] =
     collection.
       find(criteria).
       cursor[E](readPreference = ReadPreference.primary).
@@ -94,7 +94,7 @@ object CriteriaJSONWriter extends Writes[Map[String, Any]] {
     case v: Boolean => JsBoolean(v)
     case obj: JsValue => obj
     case map: Map[String, Any]@unchecked => CriteriaJSONWriter.writes(map)
-    case coll: Traversable[_] => JsArray(coll.map(toJsValue(_)).toSeq)
+    case coll: List[_] => JsArray(coll.map(toJsValue(_)).toSeq)
     case null => JsNull
     case other => throw new IllegalArgumentException(s"Criteria value type not supported: $other")
   }

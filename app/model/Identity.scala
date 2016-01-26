@@ -18,6 +18,7 @@ trait Identity[E, ID] {
   def next: ID
 }
 
+/*
 trait MongoIdentity[E <: MongoEntity] extends Identity[E, UUID] {
   this: MongoEntity =>
   override def next: UUID = UUID.randomUUID()
@@ -26,4 +27,4 @@ trait MongoIdentity[E <: MongoEntity] extends Identity[E, UUID] {
 
 //  override def set(entity: E, id: UUID): XmlFile = entity.copy(uuid = Option(id))
 
-}
+}*/
