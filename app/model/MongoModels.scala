@@ -3,32 +3,24 @@ package model
 import java.util.{UUID, Date}
 
 import play.api.libs.json.Json
-import reactivemongo.bson.{BSONDocumentReader, BSONDocument}
-import util.CustomBSONHandlers
+import reactivemongo.bson._
 
 /**
   * Created by Joseph Sebastian on 19/01/2016.
   */
 trait MongoEntity {
-  def uuid: Option[UUID]
-
-  //  def of(entity: T): Option[UUID]
-  //  def set(entity: T, id: UUID): T
-  //  def clear(entity: T): T
 }
 
-case class XmlFile(uuid: Option[UUID], name: String, newFile: Boolean, content: Option[String], time: Option[Date] = Some(new Date)) {
+case class XmlFile(uuid: Option[UUID], name: String, newFile: Boolean, content: Option[String], time: Option[Date] = Some(new Date)) extends MongoEntity {
   def this(name: String, content: String) = this(Some(UUID.randomUUID()), name, true, Some(content), Some(new Date()))
 
   def this(name: String) = this(None, name, false, None, None)
 
   def this(bson: BSONDocument) = {
-    this(Some(UUID.fromString(bson.getAs[String]("uuid").getOrElse(UUID.randomUUID().toString))), bson.getAs[String]("name").get, bson.getAs[Boolean]("newFile").getOrElse(false), bson.getAs[String]("content"), bson.getAs[Date]("time"))
+    //    this(bson.getAs[UUID]("uuid"), bson.getAs[String]("name").get, bson.getAs[Boolean]("newFile").getOrElse(false), bson.getAs[String]("content"), bson.getAs[Date]("time"))
+    this(Some(UUID.fromString(bson.getAs[String]("uuid").getOrElse(UUID.randomUUID().toString))), bson.getAs[String]("name").get, bson.getAs[Boolean]("newFile").getOrElse(false), bson.getAs[String]("content"), Some(new Date(bson.getAs[Long]("time").get)))
   }
 }
-
-//  extends MongoEntity
-
 
 object XmlFile {
   implicit val xmlFormat = Json.format[XmlFile]
@@ -50,6 +42,13 @@ object XmlFile {
       val name = bson.getAs[String]("name").get
       XmlFile(None, name, false, null, null)
     }
+  }
+
+  implicit object BSONUUIDHandler extends BSONHandler[BSONString, UUID] {
+    override def read(bson: BSONString): UUID = UUID.fromString(bson.toString)
+
+    override def write(t: UUID): BSONString = BSONString(t.toString)
+
   }
 
 }

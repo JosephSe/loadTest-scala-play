@@ -37,11 +37,8 @@ class ResponseServiceImpl @Inject()(val xmlService: XmlService, val zipService: 
   lazy val reactiveMongoApi = current.injector.instanceOf[ReactiveMongoApi]
 
   override def all(filePrefix: String): Future[List[ResponseData]] = {
-//    val xmls = xmlService.findByCriteriaAndFields(Map("name" -> Json.obj("$regex" -> JsString(filePrefix))), List("name", "uuid", "content", "time", "newFile"), 100)
-//    val zips = zipService.findByCriteriaAndFields(Map("name" -> Json.obj("$regex" -> JsString(filePrefix))),  List("name", "uuid", "content", "time", "newFile"), 100)
-//    val xmls = xmlService.findByCriteriaAndFields(Map("name" -> Json.obj("$regex" -> JsString(filePrefix))), List("name"), 100)
     val xmls = xmlService.findByCriteriaAndFields(Map("name" -> Json.obj("$regex" -> JsString(filePrefix))), List("name", "uuid", "time", "newFile"))
-    val zips = zipService.findByCriteriaAndFields(Map("name" -> Json.obj("$regex" -> JsString(filePrefix))),  List("name"))
+    val zips = zipService.findByCriteriaAndFields(Map("name" -> Json.obj("$regex" -> JsString(filePrefix))),  List("name", "uuid", "time", "newFile"))
     val files = for {
       xmlFiles <- xmls
       zipFiles <- zips

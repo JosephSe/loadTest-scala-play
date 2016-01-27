@@ -34,11 +34,3 @@ abstract class ServerResponseData {
 
 case class RawSearchResponse(data: String, time: Long, responseCode: Int) extends ServerResponseData
 case class HotelSearchResponse(hotelCount: Int, data: String, time: Long, responseCode: Int) extends ServerResponseData
-
-//abstract class Request {
-//  def payload: String
-//}
-
-//case class LegacyRequest(payload: String) extends Request
-
-//case class NovaRequest(payload: String) extends Request
