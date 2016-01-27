@@ -1,5 +1,6 @@
 package service
 
+import java.util.UUID
 import javax.inject.Inject
 
 import com.google.inject.ImplementedBy
@@ -27,6 +28,8 @@ import scala.concurrent.duration._
 @ImplementedBy(classOf[ResponseServiceImpl])
 trait ResponseService {
   def all(filePrefix: String): Future[List[ResponseData]]
+  def saveXml(xmlFile: XmlFile) :Future[Either[String, UUID]]
+  def saveZip(zipFile: ZipFile)
 }
 
 class ResponseServiceImpl @Inject()(val xmlService: XmlService, val zipService: ZipService) extends ResponseService {
@@ -34,8 +37,11 @@ class ResponseServiceImpl @Inject()(val xmlService: XmlService, val zipService: 
   lazy val reactiveMongoApi = current.injector.instanceOf[ReactiveMongoApi]
 
   override def all(filePrefix: String): Future[List[ResponseData]] = {
-    val xmls = xmlService.findByCriteria(Map("name" -> Json.obj("$regex" -> JsString(filePrefix))), 100)
-    val zips = zipService.findByCriteria(Map("name" -> Json.obj("$regex" -> JsString(filePrefix))), 100)
+//    val xmls = xmlService.findByCriteriaAndFields(Map("name" -> Json.obj("$regex" -> JsString(filePrefix))), List("name", "uuid", "content", "time", "newFile"), 100)
+//    val zips = zipService.findByCriteriaAndFields(Map("name" -> Json.obj("$regex" -> JsString(filePrefix))),  List("name", "uuid", "content", "time", "newFile"), 100)
+//    val xmls = xmlService.findByCriteriaAndFields(Map("name" -> Json.obj("$regex" -> JsString(filePrefix))), List("name"), 100)
+    val xmls = xmlService.findByCriteriaAndFields(Map("name" -> Json.obj("$regex" -> JsString(filePrefix))), List("name", "uuid", "time", "newFile"))
+    val zips = zipService.findByCriteriaAndFields(Map("name" -> Json.obj("$regex" -> JsString(filePrefix))),  List("name"))
     val files = for {
       xmlFiles <- xmls
       zipFiles <- zips
@@ -43,5 +49,15 @@ class ResponseServiceImpl @Inject()(val xmlService: XmlService, val zipService: 
     files.map { responseFiles =>
       responseFiles._1.map(new ResponseData(_)) ++ responseFiles._2.map(new ResponseData(_))
     }
+  }
+
+  override def saveXml(xmlFile: XmlFile): Future[Either[String, UUID]] =  {
+    xmlService.create(xmlFile).map { response =>
+      response
+    }
+  }
+
+  override def saveZip(zipFile: ZipFile): Unit = {
+    zipService.create(zipFile)
   }
 }

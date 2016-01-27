@@ -1,8 +1,11 @@
 package dao
 
+import model.XmlFile
+import model.XmlFile.XmlFileReader
 import play.api.Play._
 import play.api.libs.json._
 import play.modules.reactivemongo.ReactiveMongoApi
+import reactivemongo.bson.BSONDocument
 
 import scala.concurrent.Future
 
@@ -10,6 +13,8 @@ trait CRUDService[E, ID] {
   def findById(id: ID): Future[Option[E]]
 
   def findByCriteria(criteria: Map[String, Any], limit: Int): Future[List[E]]
+
+  def findByCriteriaAndFields(criteria: Map[String, Any], fields: List[String]): Future[List[E]]
 
   def create(entity: E): Future[Either[String, ID]]
 
@@ -44,11 +49,25 @@ abstract class MongoCRUDService[E: Format, ID: Format](implicit identity: Identi
   override def findByCriteria(criteria: Map[String, Any], limit: Int): Future[List[E]] =
     findByCriteria(CriteriaJSONWriter.writes(criteria), limit)
 
-  private def findByCriteria(criteria: JsObject, limit: Int): Future[List[E]] =
+  protected def findByCritAndFields(criteria: Map[String, Any], fields: List[String]): Future[List[BSONDocument]] = {
+        val filter = JsObject(fields.map(_-> JsNumber(1)).toSeq)
+    collection.genericQueryBuilder.query(CriteriaJSONWriter.writes(criteria)).projection(filter)
+      .cursor[BSONDocument](readPreference = ReadPreference.primary)
+        .collect[List]()
+  }
+
+  private def findByCriteria(criteria: JsObject, limit: Int): Future[List[E]] = {
+//    val filter = BSONDocument(
+//      "uuid" -> 1,
+//      "name" -> 1,
+//      "time" -> 1)
+//
     collection.
       find(criteria).
+      sort(JsObject(Seq("time" -> JsNumber(-1)))).
       cursor[E](readPreference = ReadPreference.primary).
       collect[List](limit)
+  }
 
   override def create(entity: E): Future[Either[String, ID]] = {
     findByCriteria(Json.toJson(identity.clear(entity)).as[JsObject], 1).flatMap {

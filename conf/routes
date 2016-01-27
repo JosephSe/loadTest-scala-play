@@ -19,3 +19,5 @@ GET     /xml/:name                   controllers.XMLController.getXML(name:Strin
 # Response
 GET     /response/all                   controllers.ResponseController.all(namePrefix:String)
 
+# Booking
+POST     /booking                   controllers.AsyncController.booking

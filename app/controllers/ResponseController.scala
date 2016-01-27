@@ -15,6 +15,7 @@ class ResponseController @Inject()(val responseService: ResponseService) extends
 
   def all(namePrefix: String = "") = Action.async {
     responseService.all(namePrefix).map { responseDataList =>
+//      println(responseDataList)
       Ok(Json.toJson(responseDataList))
     }
   }

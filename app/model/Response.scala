@@ -1,16 +1,17 @@
 package model
 
-import java.util.Date
+import java.util.{UUID, Date}
 
 import play.api.libs.json.Json
+import util.DateUtils.{DateUtils, OptionDateUtils}
 
 /**
   * Created by Joseph Sebastian on 20/01/2016.
   */
-case class ResponseData(name: String, newFile: Boolean, content: String, time: Date = new Date, typ: String) {
-  def this(xmlFile: XmlFile) = this(xmlFile.name, xmlFile.newFile, xmlFile.content, xmlFile.time, "xml")
+case class ResponseData(uuid: Option[UUID], name: String, newFile: Boolean, content: Option[String], time: Option[String], typ: String, date: Option[Date] = Some(new Date)) {
+  def this(xmlFile: XmlFile) = this(xmlFile.uuid, xmlFile.name, xmlFile.newFile, xmlFile.content, xmlFile.time.format, "xml", xmlFile.time)
 
-  def this(zipFile: ZipFile) = this(zipFile.name, zipFile.newFile, zipFile.content, zipFile.time, "zip")
+  def this(zipFile: ZipFile) = this(zipFile.uuid, zipFile.name, zipFile.newFile, Some(zipFile.content), zipFile.time.format, "zip", Some(zipFile.time))
 }
 
 object ResponseData {

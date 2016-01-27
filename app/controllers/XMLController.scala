@@ -32,7 +32,7 @@ class XMLController @Inject()(val reactiveMongoApi: ReactiveMongoApi) extends Co
   def xmlCollection: JSONCollection = reactiveMongoApi.db.collection[JSONCollection]("xml")
 
   def createXml = Action.async {
-    val xml = XmlFile(Some(UUID.randomUUID()), "test1", true, "<content>test</content>")
+    val xml = XmlFile(Some(UUID.randomUUID()), "test1", true, Some("<content>test</content>"))
     val futureResult = xmlCollection.insert(xml)
     futureResult.map(_ => Ok)
   }
