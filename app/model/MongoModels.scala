@@ -11,14 +11,14 @@ import reactivemongo.bson._
 trait MongoEntity {
 }
 
-case class XmlFile(uuid: Option[UUID], name: String, newFile: Boolean, content: Option[String], time: Option[Date] = Some(new Date)) extends MongoEntity {
-  def this(name: String, content: String) = this(Some(UUID.randomUUID()), name, true, Some(content), Some(new Date()))
+case class XmlFile(uuid: Option[UUID], name: String, content: Option[String], time: Option[Date] = Some(new Date)) extends MongoEntity {
+  def this(name: String, content: String) = this(Some(UUID.randomUUID()), name, Some(content), Some(new Date()))
 
-  def this(name: String) = this(None, name, false, None, None)
+  def this(name: String) = this(None, name, None, None)
 
   def this(bson: BSONDocument) = {
     //    this(bson.getAs[UUID]("uuid"), bson.getAs[String]("name").get, bson.getAs[Boolean]("newFile").getOrElse(false), bson.getAs[String]("content"), bson.getAs[Date]("time"))
-    this(Some(UUID.fromString(bson.getAs[String]("uuid").getOrElse(UUID.randomUUID().toString))), bson.getAs[String]("name").get, bson.getAs[Boolean]("newFile").getOrElse(false), bson.getAs[String]("content"), Some(new Date(bson.getAs[Long]("time").get)))
+    this(Some(UUID.fromString(bson.getAs[String]("uuid").getOrElse(UUID.randomUUID().toString))), bson.getAs[String]("name").get, bson.getAs[String]("content"), Some(new Date(bson.getAs[Long]("time").get)))
   }
 }
 
@@ -37,13 +37,13 @@ object XmlFile {
     override def clear(entity: XmlFile): XmlFile = entity.copy(uuid = None)
   }
 
+/*
   implicit object XmlFileReader extends BSONDocumentReader[XmlFile] {
     override def read(bson: BSONDocument): XmlFile = {
       val name = bson.getAs[String]("name").get
       XmlFile(None, name, false, null, null)
     }
   }
-
   implicit object BSONUUIDHandler extends BSONHandler[BSONString, UUID] {
     override def read(bson: BSONString): UUID = UUID.fromString(bson.toString)
 
@@ -51,14 +51,17 @@ object XmlFile {
 
   }
 
+*/
 }
 
-case class ZipFile(uuid: Option[UUID], name: String, newFile: Boolean, content: String, time: Date = new Date) extends MongoEntity {
-  def this(name: String, content: String) = this(Some(UUID.randomUUID()), name, true, content, new Date())
+case class ZipFile(uuid: Option[UUID], name: String, content: Option[Array[Byte]], time: Option[Date] = Some(new Date)) extends MongoEntity {
+  def this(name: String, content: Array[Byte]) = this(Some(UUID.randomUUID()), name, Some(content), Some(new Date()))
 
-  def this(name: String) = this(None, name, false, null, null)
+  def this(name: String) = this(None, name, None, None)
 
-  def this(bson: BSONDocument) = this(None, bson.getAs[String]("name").get, false, null, null)
+  def this(bson: BSONDocument) = this(Some(UUID.fromString(bson.getAs[String]("uuid").getOrElse(UUID.randomUUID().toString))), bson.getAs[String]("name").get, bson.getAs[Array[Byte]]("content"), Some(new Date(bson.getAs[Long]("time").get)))
+
+  //  def this(bson: BSONDocument) = this(None, bson.getAs[String]("name").get, false, None, None)
 }
 
 object ZipFile {
@@ -79,7 +82,7 @@ object ZipFile {
   implicit object ZipFileReader extends BSONDocumentReader[ZipFile] {
     override def read(bson: BSONDocument): ZipFile = {
       val name = bson.getAs[String]("name").get
-      ZipFile(None, name, false, null, null)
+      ZipFile(None, name, null, null)
     }
   }
 

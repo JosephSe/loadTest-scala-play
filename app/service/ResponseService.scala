@@ -28,8 +28,10 @@ import scala.concurrent.duration._
 @ImplementedBy(classOf[ResponseServiceImpl])
 trait ResponseService {
   def all(filePrefix: String): Future[List[ResponseData]]
-  def saveXml(xmlFile: XmlFile) :Future[Either[String, UUID]]
-  def saveZip(zipFile: ZipFile)
+
+  def saveXml(xmlFile: XmlFile): Future[Either[String, UUID]]
+
+  def saveZip(zipFile: ZipFile): Future[Either[String, UUID]]
 }
 
 class ResponseServiceImpl @Inject()(val xmlService: XmlService, val zipService: ZipService) extends ResponseService {
@@ -38,7 +40,7 @@ class ResponseServiceImpl @Inject()(val xmlService: XmlService, val zipService: 
 
   override def all(filePrefix: String): Future[List[ResponseData]] = {
     val xmls = xmlService.findByCriteriaAndFields(Map("name" -> Json.obj("$regex" -> JsString(filePrefix))), List("name", "uuid", "time", "newFile"))
-    val zips = zipService.findByCriteriaAndFields(Map("name" -> Json.obj("$regex" -> JsString(filePrefix))),  List("name", "uuid", "time", "newFile"))
+    val zips = zipService.findByCriteriaAndFields(Map("name" -> Json.obj("$regex" -> JsString(filePrefix))), List("name", "uuid", "time", "newFile"))
     val files = for {
       xmlFiles <- xmls
       zipFiles <- zips
@@ -48,13 +50,13 @@ class ResponseServiceImpl @Inject()(val xmlService: XmlService, val zipService: 
     }
   }
 
-  override def saveXml(xmlFile: XmlFile): Future[Either[String, UUID]] =  {
+  override def saveXml(xmlFile: XmlFile): Future[Either[String, UUID]] = {
     xmlService.create(xmlFile).map { response =>
       response
     }
   }
 
-  override def saveZip(zipFile: ZipFile): Unit = {
+  override def saveZip(zipFile: ZipFile): Future[Either[String, UUID]] = {
     zipService.create(zipFile)
   }
 }

@@ -3,7 +3,8 @@ package controllers
 import javax.inject.Inject
 
 import com.fasterxml.jackson.core.PrettyPrinter
-import model.XmlFile
+import model.{ZipFile, XmlFile}
+import play.api.Play
 import play.api.mvc.{Action, Controller}
 import service.ResponseService
 
@@ -28,11 +29,12 @@ class AsyncController @Inject()(val responseService: ResponseService) extends Co
             result => if (result.isRight) Created(result.right.toOption.get.toString)
             else BadRequest(result.left.toOption.get)
           }
-        //          Ok ("")
-        case "application/zip" => responseService.saveXml(new XmlFile(fileName.get, request.body.toString())).map {
-          result => if (result.isRight) Created(result.right.toOption.get.toString)
-          else BadRequest(result.left.toOption.get)
-        }
+        case "application/zip" =>
+          val content = request.body.asRaw.get.asBytes()
+          responseService.saveZip(new ZipFile(fileName.get, content.get)).map {
+            result => if (result.isRight) Created(result.right.toOption.get.toString)
+            else BadRequest(result.left.toOption.get)
+          }
         case _ => Future {
           BadRequest
         }
@@ -41,5 +43,14 @@ class AsyncController @Inject()(val responseService: ResponseService) extends Co
       BadRequest
     }
   }
+
+//  def index = Action {
+//    val app = Play.application
+//    var file = Play.application.getFile("pics/pic.jpg")
+//    val source = scala.io.Source.fromFile(file)(scala.io.Codec.ISO8859)
+//    val byteArray = source.map(_.toByte).toArray
+//    source.close()
+//    Ok(byteArray).as("image/jpeg")
+//  }
 
 }

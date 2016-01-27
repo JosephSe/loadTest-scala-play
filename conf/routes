@@ -13,7 +13,6 @@ GET     /chart/pie                  controllers.ChartController.pie
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
 
 # Xml reqeusts
-GET     /xml/createXml                   controllers.XMLController.createXml
 GET     /xml/:name                   controllers.XMLController.getXML(name:String)
 
 # Response
