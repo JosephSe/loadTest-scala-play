@@ -17,7 +17,7 @@ import scala.concurrent.Future
   */
 @ImplementedBy(classOf[ResponseServiceImpl])
 trait ResponseService {
-  def all(filePrefix: String): Future[List[ResponseData]]
+  def all(filePrefix: String): Future[Map[String, List[ResponseData]]]
 
   def saveXml(xmlFile: XmlFile): Future[Either[String, UUID]]
 
@@ -28,7 +28,7 @@ class ResponseServiceImpl @Inject()(val xmlService: XmlService, val zipService: 
 
   lazy val reactiveMongoApi = current.injector.instanceOf[ReactiveMongoApi]
 
-  override def all(filePrefix: String): Future[List[ResponseData]] = {
+  override def all(filePrefix: String): Future[Map[String, List[ResponseData]]] = {
     val xmls = xmlService.findByCriteriaAndFields(Map("name" -> Json.obj("$regex" -> JsString(filePrefix))), List("name", "uuid", "time", "newFile"))
     val zips = zipService.findByCriteriaAndFields(Map("name" -> Json.obj("$regex" -> JsString(filePrefix))), List("name", "uuid", "time", "newFile"))
     val files = for {
@@ -36,14 +36,18 @@ class ResponseServiceImpl @Inject()(val xmlService: XmlService, val zipService: 
       zipFiles <- zips
     } yield (xmlFiles, zipFiles)
     files.map { responseFiles =>
-      responseFiles._1.map(new ResponseData(_)) ++ responseFiles._2.map(new ResponseData(_))
+      Map("xml" -> responseFiles._1.map(new ResponseData(_)), "zip" -> responseFiles._2.map(new ResponseData(_)))
     }
   }
 
   override def saveXml(xmlFile: XmlFile): Future[Either[String, UUID]] = {
-    xmlService.create(xmlFile).map { response =>
-      response
+    xmlService.findByName(xmlFile.name).map { file =>
+//      file match {
+//        case Some(x)
+//      }
+//
     }
+    xmlService.create(xmlFile)
   }
 
   override def saveZip(zipFile: ZipFile): Future[Either[String, UUID]] = {

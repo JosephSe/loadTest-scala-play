@@ -40,14 +40,4 @@ class AsyncController @Inject()(val responseService: ResponseService) extends Co
       BadRequest
     }
   }
-
-  //  def index = Action {
-  //    val app = Play.application
-  //    var file = Play.application.getFile("pics/pic.jpg")
-  //    val source = scala.io.Source.fromFile(file)(scala.io.Codec.ISO8859)
-  //    val byteArray = source.map(_.toByte).toArray
-  //    source.close()
-  //    Ok(byteArray).as("image/jpeg")
-  //  }
-
 }

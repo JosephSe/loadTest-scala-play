@@ -24,7 +24,13 @@ class ApplicationSpec extends Specification {
 
       status(home) must equalTo(OK)
       contentType(home) must beSome.which(_ == "text/html")
-      contentAsString(home) must contain ("Your new application is ready.")
+      contentAsString(home) must contain ("Load testing dashboard")
+    }
+
+    "return Not found status for search request /xml" in new WithApplication() {
+      val respoonse = route(FakeRequest(GET, "/xml/get/test.zip")).get
+
+      status(respoonse) must equalTo(NOT_FOUND)
     }
   }
 }

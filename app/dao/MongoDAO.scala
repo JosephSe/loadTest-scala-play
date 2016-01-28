@@ -11,6 +11,7 @@ trait CRUDService[E, ID] {
   def findById(id: ID): Future[Option[E]]
 
   def findByName(name: String): Future[Option[E]]
+  def getCountByName(name: String): Future[Int]
 
   def findByCriteria(criteria: Map[String, Any], limit: Int): Future[List[E]]
 
@@ -45,6 +46,8 @@ abstract class MongoCRUDService[E: Format, ID: Format](implicit identity: Identi
     find(Json.obj(identity.name -> id)).
     one[E]
 
+
+  override def getCountByName(name: String): Future[Int] = Future{1}
 
   override def findByName(name: String): Future[Option[E]] = collection.find(Json.obj("name" -> name)).one[E]
 

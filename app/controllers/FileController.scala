@@ -7,20 +7,15 @@ package controllers
 import java.io.ByteArrayInputStream
 import javax.inject.Inject
 
-import model.{ResponseData, XmlFile}
+import model.ResponseData
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.iteratee.Enumerator
-import play.api.mvc.{Results, Action, Controller}
-import play.modules.reactivemongo.{ReactiveMongoApi, _}
-import play.modules.reactivemongo.json.collection.JSONCollection
-import play.mvc.Http.Response
-import reactivemongo.bson.BSONDocument
-import service.{ZipService, XmlService}
+import play.api.libs.json.Json
+import play.api.mvc.{Action, Controller}
+import service.{XmlService, ZipService}
+import util.Utils.StringUtils
 
 import scala.concurrent.Future
-import play.api.libs.json.Json
-import reactivemongo.play.json._
-import util.Utils.StringUtils
 
 class FileController @Inject()(val xmlService: XmlService, val zipService: ZipService) extends Controller {
 
@@ -29,7 +24,8 @@ class FileController @Inject()(val xmlService: XmlService, val zipService: ZipSe
     name match {
       case xml if name.endsWith(".xml") => {
         xmlService.findByName(name.removeDelimiter) map {
-          case Some(xml) => Ok(Json.toJson(new ResponseData(xml)))
+          case Some(xml) => val response = new ResponseData(xml)
+            Ok(Json.toJson(response))
           case None => NotFound("File not found")
         }
       }
