@@ -4,23 +4,13 @@ import java.util.UUID
 import javax.inject.Inject
 
 import com.google.inject.ImplementedBy
-import model.{ResponseData, ZipFile, XmlFile}
-import play.api.libs.Collections
-import play.modules.reactivemongo.ReactiveMongoApi
-import play.modules.reactivemongo.json.collection.JSONCollection
-import reactivemongo.api.collections.GenericCollection
-import reactivemongo.api.{DB, FailoverStrategy, Collection}
-import reactivemongo.bson.BSONDocument
-
-import scala.concurrent.Future
+import model.{ResponseData, XmlFile, ZipFile}
 import play.api.Play.current
-import reactivemongo.play.json._
-import play.api.libs.json.{JsObject, JsString, Json}
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.util.{Failure, Success}
+import play.api.libs.json.{JsString, Json}
+import play.modules.reactivemongo.ReactiveMongoApi
 
-import scala.concurrent._
-import scala.concurrent.duration._
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 /**
   * Created by Joseph Sebastian on 20/01/2016.

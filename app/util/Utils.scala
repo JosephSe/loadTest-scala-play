@@ -6,7 +6,7 @@ import java.util.{Calendar, Date}
 /**
   * Created by Joseph Sebastian on 26/01/2016.
   */
-object DateUtils {
+object Utils {
 
 
   implicit class DateUtils(date: Date) {
@@ -26,6 +26,12 @@ object DateUtils {
     def format: Option[String] = {
       if (date isEmpty) None
       else Some(dateFormat.format(date.get))
+    }
+  }
+
+  implicit class StringUtils(str: String) {
+    def removeDelimiter: String = {
+      str.substring(0, str.lastIndexOf("."))
     }
   }
 

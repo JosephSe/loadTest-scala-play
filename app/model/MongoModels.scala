@@ -1,6 +1,6 @@
 package model
 
-import java.util.{UUID, Date}
+import java.util.{Date, UUID}
 
 import play.api.libs.json.Json
 import reactivemongo.bson._
@@ -37,21 +37,6 @@ object XmlFile {
     override def clear(entity: XmlFile): XmlFile = entity.copy(uuid = None)
   }
 
-/*
-  implicit object XmlFileReader extends BSONDocumentReader[XmlFile] {
-    override def read(bson: BSONDocument): XmlFile = {
-      val name = bson.getAs[String]("name").get
-      XmlFile(None, name, false, null, null)
-    }
-  }
-  implicit object BSONUUIDHandler extends BSONHandler[BSONString, UUID] {
-    override def read(bson: BSONString): UUID = UUID.fromString(bson.toString)
-
-    override def write(t: UUID): BSONString = BSONString(t.toString)
-
-  }
-
-*/
 }
 
 case class ZipFile(uuid: Option[UUID], name: String, content: Option[Array[Byte]], time: Option[Date] = Some(new Date)) extends MongoEntity {
@@ -60,8 +45,6 @@ case class ZipFile(uuid: Option[UUID], name: String, content: Option[Array[Byte]
   def this(name: String) = this(None, name, None, None)
 
   def this(bson: BSONDocument) = this(Some(UUID.fromString(bson.getAs[String]("uuid").getOrElse(UUID.randomUUID().toString))), bson.getAs[String]("name").get, bson.getAs[Array[Byte]]("content"), Some(new Date(bson.getAs[Long]("time").get)))
-
-  //  def this(bson: BSONDocument) = this(None, bson.getAs[String]("name").get, false, None, None)
 }
 
 object ZipFile {

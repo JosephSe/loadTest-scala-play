@@ -1,7 +1,5 @@
 package dao
 
-import model.XmlFile
-//import model.XmlFile.XmlFileReader
 import play.api.Play._
 import play.api.libs.json._
 import play.modules.reactivemongo.ReactiveMongoApi
@@ -11,6 +9,8 @@ import scala.concurrent.Future
 
 trait CRUDService[E, ID] {
   def findById(id: ID): Future[Option[E]]
+
+  def findByName(name: String): Future[Option[E]]
 
   def findByCriteria(criteria: Map[String, Any], limit: Int): Future[List[E]]
 
@@ -25,7 +25,6 @@ trait CRUDService[E, ID] {
 
 import model.Identity
 import reactivemongo.api._
-import play.api.libs.json.__
 
 /**
   * Abstract {{CRUDService}} impl backed by JSONCollection
@@ -34,8 +33,8 @@ abstract class MongoCRUDService[E: Format, ID: Format](implicit identity: Identi
   extends CRUDService[E, ID] {
 
   import play.api.libs.concurrent.Execution.Implicits.defaultContext
-  import play.modules.reactivemongo.json.collection.JSONCollection
   import play.modules.reactivemongo.json._
+  import play.modules.reactivemongo.json.collection.JSONCollection
 
   lazy val reactiveMongoApi = current.injector.instanceOf[ReactiveMongoApi]
 
@@ -46,22 +45,25 @@ abstract class MongoCRUDService[E: Format, ID: Format](implicit identity: Identi
     find(Json.obj(identity.name -> id)).
     one[E]
 
+
+  override def findByName(name: String): Future[Option[E]] = collection.find(Json.obj("name" -> name)).one[E]
+
   override def findByCriteria(criteria: Map[String, Any], limit: Int): Future[List[E]] =
     findByCriteria(CriteriaJSONWriter.writes(criteria), limit)
 
   protected def findByCritAndFields(criteria: Map[String, Any], fields: List[String]): Future[List[BSONDocument]] = {
-        val filter = JsObject(fields.map(_-> JsNumber(1)).toSeq)
+    val filter = JsObject(fields.map(_ -> JsNumber(1)).toSeq)
     collection.genericQueryBuilder.query(CriteriaJSONWriter.writes(criteria)).projection(filter)
       .cursor[BSONDocument](readPreference = ReadPreference.primary)
-        .collect[List]()
+      .collect[List]()
   }
 
   private def findByCriteria(criteria: JsObject, limit: Int): Future[List[E]] = {
-//    val filter = BSONDocument(
-//      "uuid" -> 1,
-//      "name" -> 1,
-//      "time" -> 1)
-//
+    //    val filter = BSONDocument(
+    //      "uuid" -> 1,
+    //      "name" -> 1,
+    //      "time" -> 1)
+    //
     collection.
       find(criteria).
       sort(JsObject(Seq("time" -> JsNumber(-1)))).

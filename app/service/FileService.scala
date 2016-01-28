@@ -1,14 +1,13 @@
 package service
 
-import java.util.{Date, UUID}
+import java.util.UUID
 
 import com.google.inject.ImplementedBy
 import dao.{CRUDService, MongoCRUDService}
 import model.{XmlFile, ZipFile}
-import reactivemongo.bson.BSONDocument
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 /**
   * Created by Joseph Sebastian on 21/01/2016.

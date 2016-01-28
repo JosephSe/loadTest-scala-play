@@ -2,15 +2,12 @@ package controllers
 
 import javax.inject.Inject
 
-import com.fasterxml.jackson.core.PrettyPrinter
-import model.{ZipFile, XmlFile}
-import play.api.Play
+import model.{XmlFile, ZipFile}
 import play.api.mvc.{Action, Controller}
 import service.ResponseService
 
-import scala.concurrent.Future
-import scala.xml
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 /**
   * Created by Joseph Sebastian on 26/01/2016.
@@ -44,13 +41,13 @@ class AsyncController @Inject()(val responseService: ResponseService) extends Co
     }
   }
 
-//  def index = Action {
-//    val app = Play.application
-//    var file = Play.application.getFile("pics/pic.jpg")
-//    val source = scala.io.Source.fromFile(file)(scala.io.Codec.ISO8859)
-//    val byteArray = source.map(_.toByte).toArray
-//    source.close()
-//    Ok(byteArray).as("image/jpeg")
-//  }
+  //  def index = Action {
+  //    val app = Play.application
+  //    var file = Play.application.getFile("pics/pic.jpg")
+  //    val source = scala.io.Source.fromFile(file)(scala.io.Codec.ISO8859)
+  //    val byteArray = source.map(_.toByte).toArray
+  //    source.close()
+  //    Ok(byteArray).as("image/jpeg")
+  //  }
 
 }
