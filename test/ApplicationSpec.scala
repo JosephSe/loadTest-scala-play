@@ -27,10 +27,22 @@ class ApplicationSpec extends Specification {
       contentAsString(home) must contain ("Load testing dashboard")
     }
 
-    "return Not found status for search request /xml" in new WithApplication() {
-      val respoonse = route(FakeRequest(GET, "/xml/get/test.zip")).get
+    "return Not found status for unknown search request /xml/get xml" in new WithApplication() {
+      val respoonse = route(FakeRequest(GET, "/xml/get/test1232.xml")).get
 
       status(respoonse) must equalTo(NOT_FOUND)
+    }
+
+    "return Not found status for unknown search request /xml/get zip" in new WithApplication() {
+      val respoonse = route(FakeRequest(GET, "/xml/get/test1232.zip")).get
+
+      status(respoonse) must equalTo(NOT_FOUND)
+    }
+    "return 200 status & respons for valid search request /xml/get xml" in new WithApplication() {
+      val respoonse = route(FakeRequest(GET, "/xml/get/test.xml")).get
+
+      status(respoonse) must equalTo(OK)
+      contentType(respoonse) must beSome.which(_ == "application/json")
     }
   }
 }
