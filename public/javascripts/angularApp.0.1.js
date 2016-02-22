@@ -31,19 +31,51 @@ app.controller('AppCtrl', ['$rootScope', '$scope', '$mdSidenav', '$http', '$log'
 				$mdSidenav(menuId).toggle();
 			};
 
+			var ws = new WebSocket("ws://localhost:9000/ws/broadcast3");
+
+                ws.onopen = function(){
+                    console.log("Socket has been opened!");
+                };
+
+                ws.onmessage = function(message) {
+                    listener(JSON.parse(message.data));
+                };
+            function listener(data) {
+                  var messageObj = data;
+                  console.log("Received data from websocket: ", messageObj);
+                }
+
 			$scope.connect = function() {
+                var socket = new SockJS("/ws/broadcast4");
+                var stompClient = Stomp.over(socket);
+                stompClient.connect({}, function(frame) {
+                    alert('Connected: ' + frame);
+//                    stompClient.send("/app/ws", {}, {});
+                    stompClient.subscribe('/broadcast', function(response){
+                        alert(response.success);
+                    });
+                });
+			}
+			/** start listening on messages from selected room */
+                    $scope.listen = function () {
+                        $scope.chatFeed = new EventSource("/ws/broadcast3");
+                        $scope.chatFeed.addEventListener("message", $scope.addMsg, false);
+                    };
+                    $scope.listen();
+			$scope.connect1 = function() {
 				try {
-					var socket = new SockJS('/hello');
+					var socket = new SockJS('/ws/broadcast3');
+//					var socket = new SockJS('/hello');
 					$scope.stompClient = Stomp.over(socket);
 					$scope.stompClient.connect({},
 						function(frame) {
 							console.log('Connected: ' + frame);
-							$scope.stompClient.subscribe('/topic/greetings', function(greeting) {
+							$scope.stompClient.subscribe('/broadcast', function(greeting) {
 								var newFileObj = JSON.parse(greeting.body);
 								if ($scope.fileNamePrefix === "" || newFileObj.fileName.indexOf($scope.fileNamePrefix) === 0) {
-								    $scope.updateUI(newFileObj);
-//								    if(newFileObj.type==="xml") appData.xmls.push(newFileObj);
-//								    else appData.zips.push(newFileObj);
+//								    $scope.updateUI(newFileObj);
+								    if(newFileObj.typ==="xml") appData.xmls.push(newFileObj);
+								    else appData.zips.push(newFileObj);
 									$scope.$apply();
 								}
 							});
@@ -64,38 +96,40 @@ app.controller('AppCtrl', ['$rootScope', '$scope', '$mdSidenav', '$http', '$log'
 			};
 
 			$scope.$watch("client.connected", function(newValue, oldValue) {
-				if (newValue == true) {
 					$scope.connect();
-					appData.client.allLoaded = false;
-				} else {
-					$scope.disconnect();
-				}
 			});
+//			Original
+//			$scope.$watch("client.connected", function(newValue, oldValue) {
+//				if (newValue == true) {
+//					$scope.connect();
+//					appData.client.allLoaded = false;
+//				} else {
+//					$scope.disconnect();
+//				}
+//			});
+
+
+
 			$scope.loadXML = function(xml) {
 				$scope.data.fileLoading = true;
 				$scope.data.clearLoadedXML;
-				$http.get(hostName + 'xml/get/' + xml.fileName).
+				$http.get(hostName + 'xml/get/' + xml.name +"."+xml.typ).
 				success(function(data) {
 					xml.newFile = false;
 					$scope.data.fileLoading = false;
 					 var prettyXML = $scope.prettyXML(data);
 //					 $scope.prettyXML = prettyXML;
-					$scope.data.loadedXML.fileName = xml.fileName;
+					$scope.data.loadedXML.fileName = xml.name;
 					$scope.data.loadedXML.content = prettyXML;
 //					$scope.data.loadedXML.content = $sce.trustAsHtml(prettyXML);
 				});
 			};
 			$scope.loadAll = function() {
-//				appData.xmls = appData.xmls;
 				appData.client.allLoaded = true;
-				$http.get(hostName + 'xml/all?fileNamePrefix=' + $scope.fileNamePrefix)
+				$http.get(hostName + 'response/all?namePrefix=' + $scope.fileNamePrefix)
 					.success(function(data) {
 						appData.clearXMLs();
-						for (i = 0; i < data.length; i++) {
-						    $scope.updateUI(data[i]);
-//						    if(data[i].type ==="xml") appData.xmls.push(data[i]);
-//						    else appData.zips.push(data[i]);
-						}
+						$scope.updateUI(data);
 						appData.client.allLoaded = false;
 					});
 			};
@@ -159,25 +193,20 @@ app.controller('AppCtrl', ['$rootScope', '$scope', '$mdSidenav', '$http', '$log'
 					}
 				}
 
-            $scope.prettyXML = function(xmlData) {
-                if(xmlData != "") {
-                    var pXML = vkbeautify.xml(xmlData);
-                    var pr_amp = /&/g;
-                    var pr_lt = /</g;
-                    var pr_gt = />/g;
-                    var pr_quot = /\"/g;
-                    /** escapest html special characters to html. */
-                    return pXML;
-//                        return pXML.replace(pr_amp, '&').replace(pr_lt, '<').replace(pr_gt, '>');
-                }
-            };
             $scope.updateUI = function(xmlData) {
-                if(!$scope.client.showAutomation && (xmlData.fileName.indexOf('automationTest-') == 0 || xmlData.fileName.indexOf('TSTJ_BBC3_') == 0)) {
-                    //show nothing
-                } else {
-                    if(xmlData.type ==="xml") appData.xmls.push(xmlData);
-                    else appData.zips.push(xmlData);
-            	}
+//                if(!$scope.client.showAutomation && (xmlData.fileName.indexOf('automationTest-') == 0 || xmlData.fileName.indexOf('TSTJ_BBC3_') == 0)) {
+//                    show nothing
+//                } else {
+                						for (i = 0; i < xmlData.xml.length; i++) {
+                						    appData.xmls.push(xmlData.xml[i]);
+                						}
+                						for (i = 0; i < xmlData.zip.length; i++) {
+                						    appData.zips.push(xmlData.zip[i]);
+                						}
+
+//                    if(xmlData.typ ==="xml") appData.xmls.push(xmlData);
+//                    else appData.zips.push(xmlData);
+//            	}
 
             };
 		}

@@ -14,7 +14,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 /**
   * Created by Joseph Sebastian on 02/02/2016.
   */
-class ResponseControllerTest extends FlatSpec with MockFactory with Matchers with PlaySpecification with Results{
+class ResponseControllerTest extends FlatSpec with MockFactory with Matchers with Results{
+//class ResponseControllerTest extends FlatSpec with MockFactory with Matchers with PlaySpecification with Results{
 
   val responseService = stub[ResponseService]
   val underTest = new ResponseController(responseService)

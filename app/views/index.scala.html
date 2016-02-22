@@ -1,6 +1,14 @@
 @(message: String)
 <html lang="en" ng-app="StarterApp">
-<body layout="column">
+<head>
+    <!--#formatter:off-->
+    <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/angular_material/1.0.0/angular-material.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=RobotoDraft:300,400,500,700,400italic">
+    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/material.css")">
+    <meta name="viewport" content="initial-scale=1"/>
+    <!--#formatter:on-->
+</head>
+<body layout="column" ng-controller="AppCtrl">
 <md-toolbar>
     <div layout="row" layout-align="space-around center">
         <div>
@@ -8,195 +16,236 @@
                 <span class="visually-hidden"></span>
             </button>
         </div>
-        <div flex="77" layout="row" layout-align="space-around center">
-            <h3 class="md-toolbar-tools md-raised">Load testing dashboard</h3>
+        <div>
+            <img src="img/kuoni2x.png" id="logo" title="Kuoni Travel" alt="Kuoni Travel" class="logo">
         </div>
+        <div layout="row" layout-align="space-around center">
+            <!--<div flex="77" layout="row" layout-align="space-around center">-->
+            <h1 class="md-toolbar-tools md-raised">ASYNC response testing server</h1>
+        </div>
+        <div layout="row">
+            <!--<div>S</div>-->
+            <md-tooltip>
+                Server Connection:{{client.connected}}
+            </md-tooltip>
+            <md-switch ng-model="client.connected" aria-label="Connected">
+                <!--<div ng-if="client.connected"><md-tooltip>Server Connected</md-tooltip></div>-->
+                <!--<div ng-if="!client.connected"><md-tooltip>Server disconnected</md-tooltip></div>-->
+            </md-switch>
+        </div>
+        <div layout="row">
+            <!--<div>A</div>-->
+            <md-tooltip>
+                Show automation files:{{client.showAutomation}}
+            </md-tooltip>
+            <md-switch ng-model="client.showAutomation" aria-label="Show automation files">
+                <!--<div ng-if="client.showAutomation">Showing</div>-->
+                <!--<div ng-if="!client.showAutomation">Not showing</div>-->
+            </md-switch>
+        </div>
+        <div flex="13">
+            <md-button class="md-fab md-raised md-primary md-hue-1" ng-disabled="!searchEnabled"
+                       ng-click="toggleRight()" aria-label="Search">
+                <ng-md-icon icon="search" style="fill: wheat" size="32px" options='{"duration": 375}'>Search
+                </ng-md-icon>
+            </md-button>
+        </div>
+        <div><h5><a target="_blank" href="/api/index.html">Ver1.2</a></h5></div>
     </div>
 </md-toolbar>
-<div layout="row" flex ng-controller="AppCtrl" ng-init="initChart()">
-    <div layout="column" flex id="content">
-        <div class="col-xs-offset-5 col-xs-2" ng-if="dataLoading">
-            <div class="col-xs-offset-3">
-                <md-progress-circular class="md-hue-2" md-mode="indeterminate"></md-progress-circular>
+<div layout="row" flex>
+    <md-sidenav layout="column" class="md-sidenav-left md-whiteframe-8dp" md-component-id="left"
+                md-is-locked-open="$mdMedia('gt-sm')">
+        <md-toolbar md-scroll-shrink class="md-info md-hue-1">
+            <div class="md-toolbar-tools" layout-align="center center" flex>
+                <div flex="44">
+                    <h5 class="md-title">Files received</h5>
+                </div>
+                <div flex="33" layout-align="right center">
+                    <md-button ng-disabled="client.allLoaded" class="md-raised md-primary md-hue-1"
+                               ng-click="loadAll()" aria-label="Load all">
+                        <ng-md-icon icon="play_download" style="fill: wheat" size="32px"
+                                    options='{"duration": 375}'>
+                            <md-tooltip>Load all</md-tooltip>
+                        </ng-md-icon>
+                    </md-button>
+                </div>
+                <div flex="22" layout-align="right right">
+                    <md-button ng-if="!$client.allLoaded" class="md-accent" ng-click="clearAll()"
+                               aria-label="Clear all">
+                        <ng-md-icon icon="clear_all" style="fill: wheat" size="32px" options='{"duration": 375}'>
+                            <md-tooltip>Clear all</md-tooltip>
+                        </ng-md-icon>
+                    </md-button>
+                </div>
             </div>
+        </md-toolbar>
+
+        <div ng-cloak>
+            <md-content layout-padding>
+                <md-input-container class="md-block filter-input" flex-gt-xs>
+                    <label for="fileNamePrefix">Filter files starting with</label>
+                    <input type="text" id="fileNamePrefix"
+                           ng-model="fileNamePrefix" md-sidenav-focus>
+                </md-input-container>
+                <md-tabs md-dynamic-height md-border-bottom>
+                    <md-tab label="xml">
+                        <md-content class="md-padding">
+                            <!--<h1 class="md-display-2">XML's</h1>-->
+                            <md-list>
+                                <md-list-item ng-repeat="xml in xmls">
+                                    <div layout="row" ng-class="{'newFile': xml.newFile}">
+                                        <div flex="88" ng-click="loadXML(xml)" class="pointer"><p>{{ xml.name }}</p>
+                                            <md-tooltip>{{ xml.time }}</md-tooltip>
+                                        </div>
+                                        <div flex="22" class="md-secondary xmlDownloadBtn">
+                                            <a ng-href="xml/{{xml.name}}">
+                                                <ng-md-icon class="md-avatar" icon="cloud_download" style="fill: wheat"
+                                                            size="24px"
+                                                            options='{"duration": 375}'></ng-md-icon>
+                                            </a>
+                                            <md-tooltip>Download</md-tooltip>
+                                        </div>
+                                    </div>
+                                </md-list-item>
+                            </md-list>
+                        </md-content>
+                    </md-tab>
+                    <md-tab label="zip">
+                        <md-content class="md-padding">
+                            <!--<h1 class="md-display-2">XML's</h1>-->
+                            <md-list>
+                                <md-list-item ng-repeat="zip in zips">
+                                    <div layout="row" ng-class="{'newFile': zip.newFile}">
+                                        <div flex="88" ng-click="loadXML(zip)" class="pointer"><p>{{ zip.name }}</p>
+                                            <md-tooltip>{{ xml.time }}</md-tooltip>
+                                        </div>
+                                        <div flex="22" class="md-secondary xmlDownloadBtn">
+                                            <a ng-href="xml/{{zip.name}}">
+                                                <ng-md-icon class="md-avatar" icon="cloud_download" style="fill: wheat"
+                                                            size="24px"
+                                                            options='{"duration": 375}'></ng-md-icon>
+                                            </a>
+                                            <md-tooltip>Download</md-tooltip>
+                                        </div>
+                                    </div>
+                                </md-list-item>
+                            </md-list>
+                        </md-content>
+                    </md-tab>
+                </md-tabs>
+                <!--</md-list>-->
+            </md-content>
+            <!--
+                        <md-content layout-padding>
+                            <md-input-container>
+                                <label for="fileNamePrefix">Filter files starting with</label>
+                                <input type="text" id="fileNamePrefix"
+                                       ng-model="fileNamePrefix" md-sidenav-focus>
+                            </md-input-container>
+
+                            <md-list>
+                                <md-list-item ng-repeat="xml in xmls">
+                                    <div layout="row" ng-class="{'newFile': xml.newFile}">
+                                        <div flex="88" ng-click="loadXML(xml)" class="pointer"><p>{{ xml.name }}</p></div>
+                                        <div flex="22" class="md-secondary xmlDownloadBtn">
+                                            <a ng-href="xml/{{xml.name}}">
+                                                <ng-md-icon class="md-avatar" icon="cloud_download" style="fill: wheat" size="24px"
+                                                            options='{"duration": 375}'></ng-md-icon>
+                                            </a>
+                                            <md-tooltip>Download</md-tooltip>
+                                        </div>
+                                    </div>
+                                </md-list-item>
+                            </md-list>
+                        </md-content>
+            -->
         </div>
-        <md-content layout="row" flex class="md-padding" ng-if="!dataLoading">
-            <div class="col-lg-4 col-sm-4" id="data-table-price">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <i class="fa fa-bar-chart-o fa-fw"></i> <h4>Cheapest Price</h4>
-                        <div class="table-responsive">
-                            <table class="table table-striped table-hover" id="dataTables-prices">
-                                <!--<caption>Cheapest Price</caption>-->
-                                <thead>
-                                <tr>
-                                    <th></th>
-                                    <th>Number</th>
-                                    <th>Percentage</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr>
-                                    <td>Prices Matching</td>
-                                    <td>{{chartDataPrice.data.bothSame}}</td>
-                                    <td>{{chartDataPrice.data.bothSamePct}}%</td>
-                                </tr>
-                                <tr>
-                                    <td>Nova > Legacy</td>
-                                    <td>{{chartDataPrice.data.nova}}</td>
-                                    <td>{{chartDataPrice.data.novaPct}}%</td>
-                                </tr>
-                                <tr>
-                                    <td>Legacy > Nova</td>
-                                    <td>{{chartDataPrice.data.legacy}}</td>
-                                    <td>{{chartDataPrice.data.legacyPct}}%</td>
-                                </tr>
-                                <tr>
-                                    <td>Prices NA returned</td>
-                                    <td>{{chartDataPrice.data.bothZeroHotels}}</td>
-                                    <td>{{chartDataPrice.data.bothZeroHotelsPct}}%</td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="panel-body">
-                        <canvas id="priceChart" class="chart chart-pie" data="chartDataPrice.pieData"
-                                labels="chartDataPrice.labels" legend="true"></canvas>
-                    </div>
-                </div>
+    </md-sidenav>
+    <div layout="column" flex id="content">
+        <md-toolbar class="md-hue-1">
+            <div class="md-toolbar-tools">
+                <h2 class="md-flex md-title">FileName: {{loadedXML.name}}</h2>
             </div>
-            <div class="col-lg-4 col-sm-4" id="data-table-hotel">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <i class="fa fa-bar-chart-o fa-fw"></i> <h4>Hotels Returned</h4>
-                        <div class="table-responsive">
-                            <table class="table table-striped table-hover" id="dataTables-hotels">
-                                <thead>
-                                <tr>
-                                    <th></th>
-                                    <th>Number</th>
-                                    <th>Percentage</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr>
-                                    <td>Hotels Matching</td>
-                                    <td>{{chartDataHotel.data.bothSame}}</td>
-                                    <td>{{chartDataHotel.data.bothSamePct}}%</td>
-                                </tr>
-                                <tr>
-                                    <td>Nova > Legacy</td>
-                                    <td>{{chartDataHotel.data.nova}}</td>
-                                    <td>{{chartDataHotel.data.novaPct}}%</td>
-                                </tr>
-                                <tr>
-                                    <td>Legacy > Nova</td>
-                                    <td>{{chartDataHotel.data.legacy}}</td>
-                                    <td>{{chartDataHotel.data.legacyPct}}%</td>
-                                </tr>
-                                <tr>
-                                    <td>Zero Hotels returned</td>
-                                    <td>{{chartDataHotel.data.bothZeroHotels}}</td>
-                                    <td>{{chartDataHotel.data.bothZeroHotelsPct}}%</td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+        </md-toolbar>
+        <md-content layout="column" flex class="md-padding" layout-padding="">
+            <md-progress-circular ng-if="data.fileLoading" class="md-hue-2"
+                                  md-mode="indeterminate"></md-progress-circular>
+            <p ng-if="!data.fileLoading">{{loadedXML.content}}</p>
+            <p ng-if="!data.fileLoading" ng-bind-html="loadedXML.content"></p>
+            <!--<div ng-bind-html="loaded"></div>-->
 
-                    <div class="panel-body">
-                        <canvas id="hotelChart" class="chart chart-pie" data="chartDataHotel.pieData"
-                                labels="chartDataHotel.labels" legend="true"></canvas>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4 col-sm-4" id="data-table-rooms">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <i class="fa fa-bar-chart-o fa-fw"></i> <h4>Rooms Returned</h4>
-                        <div class="table-responsive">
-                            <table class="table table-striped table-hover" id="dataTables-rooms">
-                                <thead>
-                                <tr>
-                                    <th></th>
-                                    <th>Number</th>
-                                    <th>Percentage</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr>
-                                    <td>Rooms Matching</td>
-                                    <td>{{chartDataRoom.data.bothSame}}</td>
-                                    <td>{{chartDataRoom.data.bothSamePct}}%</td>
-                                </tr>
-                                <tr>
-                                    <td>Nova > Legacy</td>
-                                    <td>{{chartDataRoom.data.nova}}</td>
-                                    <td>{{chartDataRoom.data.novaPct}}%</td>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Legacy > Nova</td>
-                                    <td>{{chartDataRoom.data.legacy}}</td>
-                                    <td>{{chartDataRoom.data.legacyPct}}%</td>
-                                </tr>
-                                <tr>
-                                    <td>Zero Rooms returned</td>
-                                    <td>{{chartDataRoom.data.bothZeroHotels}}</td>
-                                    <td>{{chartDataRoom.data.bothZeroHotelsPct}}%</td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <div class="panel-body">
-                        <canvas id="roomChart" class="chart chart-pie" data="chartDataRoom.pieData"
-                                labels="chartDataRoom.labels" legend="true"></canvas>
-                    </div>
-                </div>
+            <!--Alert-->
+            <div ng-if="alert">
+                <br/>
+                <b layout="row" layout-align="center center" class="md-padding">
+                    {{alert}}
+                </b>
             </div>
         </md-content>
+
+
+        <md-sidenav layout="column" class="md-sidenav-right" md-component-id="right">
+            <!--<md-sidenav class="md-sidenav-right md-whiteframe-z2" md-component-id="right">-->
+            <md-toolbar class="md-theme-light md-hue-2">
+                <h1 class="md-toolbar-tools">Search for XML responses</h1>
+            </md-toolbar>
+            <md-content ng-controller="SearchController" layout-padding>
+                <form name="searchForm">
+                    <md-input-container>
+                        <label for="testInput">File name</label>
+                        <input type="text" id="testInput" ng-model="searchData.name" md-sidenav-focus>
+                    </md-input-container>
+                    <md-input-container>
+                        <label for="createdDate">Created since (yyyy-mm-dd)</label>
+                        <input type="text" id="createdDate" name="createdDate" ng-model="searchData.creationDate"
+                               ng-pattern="/^[0-9]{1,4}-[0-1][0-9]-[0-3][0-9]$/" md-sidenav-focus>
+
+                        <div ng-messages="searchForm.createdDate.$error">
+                            <div ng-message="pattern">Date is not valid!</div>
+                        </div>
+
+                    </md-input-container>
+                    <md-input-container flex layout-padding>
+                        <md-button ng-click="searchXML()" class="md-raised md-primary">Search</md-button>
+                        <md-button ng-click="close()" class="md-accent  md-hue-1">Close</md-button>
+                    </md-input-container>
+                </form>
+                <div ng-if="isResultEmpty">
+                    <md-divider></md-divider>
+                    <p>No Result Found</p>
+                </div>
+
+                <md-list ng-repeat="(dateKey, xmlList) in searchResult">
+                    <md-divider></md-divider>
+                    <md-subheader class="md-no-sticky">Created Date: {{dateKey | date:'yyyy-MM-dd' }}</md-subheader>
+                    <md-list-item class="pointer" ng-repeat="xml in xmlList" ng-click="viewXML(xml)">
+                        <p class="md-hue-1">{{ xml.name }}</p>
+                    </md-list-item>
+                </md-list>
+
+            </md-content>
+        </md-sidenav>
+
+
     </div>
 </div>
 <!--#formatter:off-->
 <!-- Angular Material Dependencies -->
-<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
-<script src="https://cdn.datatables.net/1.10.10/js/jquery.dataTables.min.js"></script>
-<!-- Latest compiled and minified JavaScript -->
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular-animate.min.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular-aria.min.js"></script>
-<script src="@routes.Assets.versioned("javascripts/lib/sb-admin-2.js")" type="text/javascript"></script>
-<script src="@routes.Assets.versioned("javascripts/lib/Chart.min.js")" type="text/javascript"></script>
-<script src="@routes.Assets.versioned("javascripts/lib/angular-chart.min.js")" type="text/javascript"></script>
-<script src="@routes.Assets.versioned("javascripts/lib/angular-datatables.min.js")" type="text/javascript"></script>
-<!--<script src="js/Chart.min.js"></script>-->
-<!--<script src="js/angular-chart.min.js"></script>-->
+<script src="@routes.Assets.versioned("javascripts/lib/sockjs.min.0.1.js")"></script>
+<script src="@routes.Assets.versioned("javascripts/lib/stomp.min.0.1.js")"></script>
+<!--<script src="@routes.Assets.versioned("javascripts/lib/run_prettify.js")"></script>-->
+<!--<script src="@routes.Assets.versioned("javascripts/lib/prettify.js")"></script>-->
+<!--<script src="@routes.Assets.versioned("javascripts/lib/vkbeautify.js")"></script>-->
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-cookies.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-messages.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-animate.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-aria.min.js"></script>
 
-<script src="@routes.Assets.versioned("javascripts/load.js")" type="text/javascript"></script>
-<!--<script src="js/load.js"></script>-->
+<script src="http://ajax.googleapis.com/ajax/libs/angular_material/1.0.0/angular-material.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-material-icons/0.6.0/angular-material-icons.min.js"></script>
+<script src="@routes.Assets.versioned("javascripts/angularApp.0.1.js")"></script>
 <!--#formatter:on-->
 </body>
-<head>
-    <!--#formatter:off-->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=RobotoDraft:300,400,500,700,400italic">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-    <!-- Optional theme -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
-    <!--<link rel="stylesheet" href="css/material.css">-->
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.10/css/jquery.dataTables.min.css">
-
-    <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/lib/angular-chart.css")">
-    <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/lib/sb-admin-2.css")">
-    <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/lib/timeline.css")">
-    <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/load.css")">
-    <!--<link rel="stylesheet" href="css/angular-chart.css">-->
-    <!--<link rel="stylesheet" href="css/load.css">-->
-
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <!--#formatter:on-->
-</head>
 </html>

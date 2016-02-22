@@ -23,3 +23,13 @@ GET     /response/all                   controllers.ResponseController.all(nameP
 
 # Booking
 POST     /booking                   controllers.AsyncController.booking
+
+# Websocket test site
+GET   /ws/socket         controllers.WebsocketController.socket
+GET   /ws/sender         controllers.WebsocketController.sender
+GET   /ws/broadcast         controllers.WebsocketController.broadcast
+GET   /ws/broadcast1         controllers.WebsocketController.broadcast1
+GET   /ws/broadcast3         controllers.WebsocketController.broadcast3
+#https://github.com/fdimuccio/play2-sockjs
+#->   /ws/broadcast4         controllers.WebsocketController.broadcastSockJS
+#->   /ws/broadcast4         controllers.WebsocketController.sockjs
