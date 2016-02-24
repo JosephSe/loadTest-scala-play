@@ -1,35 +1,36 @@
 package service
 
 import com.google.inject.ImplementedBy
-import play.api.libs.iteratee.{Concurrent, Enumerator}
-import play.api.libs.json.JsValue
+import play.api.libs.iteratee.{Concurrent, Iteratee, Enumerator}
+import play.api.libs.json.{Json, JsValue}
 
+import scala.collection.mutable.Set
 import scala.concurrent.Channel
+
+import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
   * Created by Joseph Sebastian on 19/02/2016.
   */
 @ImplementedBy(classOf[MessageBroadcasterImpl])
 trait MessageBroadcaster {
+  def broadcast(message: JsValue)
 
-  def broadcast(message:JsValue)
-
-  val messageOut:Enumerator[JsValue]
-  val broadcastChannel:Concurrent.Channel[JsValue]
-//  def messageOut:Enumerator[JsValue]
-//  def broadcastChannel:Concurrent.Channel[JsValue]
+  def register(channelID: Int, outChannel: Concurrent.Channel[JsValue])
 }
 
 class MessageBroadcasterImpl extends MessageBroadcaster {
-   val channels = Concurrent.broadcast[JsValue]
-//  val (messageOt, broadcastChan) = Concurrent.broadcast[JsValue]
+  val channels = Concurrent.broadcast[JsValue]
 
   override def broadcast(message: JsValue): Unit = {
-    broadcastChannel push message
+    MessageBroadcasterImpl.c.foreach(_._2.push(message))
   }
 
-//  override def messageOut: Enumerator[JsValue] = messageOt
-//  override def broadcastChannel: Concurrent.Channel[JsValue] = broadcastChan
-  override val messageOut: Enumerator[JsValue] = channels._1
-  override val broadcastChannel: Concurrent.Channel[JsValue] = channels._2
+  override def register(channelID: Int, outChannel: Concurrent.Channel[JsValue]): Unit = {
+    MessageBroadcasterImpl.c.add((channelID, outChannel))
+  }
+}
+
+object MessageBroadcasterImpl {
+  val c: Set[(Int, Concurrent.Channel[JsValue])] = Set() // (channelID, Channel))
 }

@@ -4,7 +4,7 @@ import java.util.UUID
 import javax.inject.Inject
 
 import com.google.inject.ImplementedBy
-import model.{ResponseData, XmlFile, ZipFile}
+import model.{MongoEntity, ResponseData, XmlFile, ZipFile}
 import play.api.Play.current
 import play.api.libs.json.{JsString, Json}
 import play.modules.reactivemongo.ReactiveMongoApi
@@ -19,9 +19,11 @@ import scala.concurrent.Future
 trait ResponseService {
   def all(filePrefix: String): Future[Map[String, List[ResponseData]]]
 
-  def saveXml(xmlFile: XmlFile): Future[Either[String, UUID]]
+  def saveFile(file: MongoEntity): Future[Either[String, UUID]]
 
-  def saveZip(zipFile: ZipFile): Future[Either[String, UUID]]
+  //  def saveXml(xmlFile: XmlFile): Future[Either[String, UUID]]
+
+  //  def saveZip(zipFile: ZipFile): Future[Either[String, UUID]]
 }
 
 class ResponseServiceImpl @Inject()(val xmlService: XmlService, val zipService: ZipService) extends ResponseService {
@@ -40,17 +42,19 @@ class ResponseServiceImpl @Inject()(val xmlService: XmlService, val zipService: 
     }
   }
 
-  override def saveXml(xmlFile: XmlFile): Future[Either[String, UUID]] = {
-    xmlService.findByName(xmlFile.name).map { file =>
-//      file match {
-//        case Some(x)
-//      }
-//
+  /*
+    override def saveXml(xmlFile: XmlFile): Future[Either[String, UUID]] = {
+      xmlService.findByName(xmlFile.name).map { file =>
+      }
+      xmlService.create(xmlFile)
     }
-    xmlService.create(xmlFile)
-  }
 
-  override def saveZip(zipFile: ZipFile): Future[Either[String, UUID]] = {
-    zipService.create(zipFile)
+    override def saveZip(zipFile: ZipFile): Future[Either[String, UUID]] = {
+      zipService.create(zipFile)
+    }
+  */
+  override def saveFile(file: MongoEntity): Future[Either[String, UUID]] = {
+    case xml:XmlFile => xmlService.create(xml)
+    case zip:ZipFile => zipService.create(zip)
   }
 }

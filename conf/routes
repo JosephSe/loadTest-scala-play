@@ -13,10 +13,11 @@ GET     /chart/pie                  controllers.ChartController.pie
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
 
 # Xml reqeusts
-GET     /xml/get/:name                   controllers.FileController.getFile(name:String)
-GET     /file/get/:name                   controllers.FileController.getFile(name:String)
-GET     /xml/:name                   controllers.FileController.loadFile(name:String)
-GET     /file/:name                   controllers.FileController.loadFile(name:String)
+GET     /xml/get/:typ/:id              controllers.FileController.getFile(typ:String, id:String)
+GET     /file/get/:typ/:id             controllers.FileController.getFile(typ:String, id:String)
+#GET     /file/get/:name               controllers.FileController.getFile(name:String)
+GET     /xml/:name                     controllers.FileController.downloadFileName(name:String)
+GET     /file/download/:typ/:id        controllers.FileController.downloadFile(typ:String, id:String)
 
 # Response
 GET     /response/all                   controllers.ResponseController.all(namePrefix:String)
@@ -25,11 +26,5 @@ GET     /response/all                   controllers.ResponseController.all(nameP
 POST     /booking                   controllers.AsyncController.booking
 
 # Websocket test site
-GET   /ws/socket         controllers.WebsocketController.socket
 GET   /ws/sender         controllers.WebsocketController.sender
 GET   /ws/broadcast         controllers.WebsocketController.broadcast
-GET   /ws/broadcast1         controllers.WebsocketController.broadcast1
-GET   /ws/broadcast3         controllers.WebsocketController.broadcast3
-#https://github.com/fdimuccio/play2-sockjs
-#->   /ws/broadcast4         controllers.WebsocketController.broadcastSockJS
-#->   /ws/broadcast4         controllers.WebsocketController.sockjs

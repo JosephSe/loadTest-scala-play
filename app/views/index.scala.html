@@ -118,7 +118,7 @@
                                 <md-list-item ng-repeat="zip in zips">
                                     <div layout="row" ng-class="{'newFile': zip.newFile}">
                                         <div flex="88" ng-click="loadXML(zip)" class="pointer"><p>{{ zip.name }}</p>
-                                            <md-tooltip>{{ xml.time }}</md-tooltip>
+                                            <md-tooltip>{{ zip.time }}</md-tooltip>
                                         </div>
                                         <div flex="22" class="md-secondary xmlDownloadBtn">
                                             <a ng-href="xml/{{zip.name}}">
@@ -165,14 +165,14 @@
     <div layout="column" flex id="content">
         <md-toolbar class="md-hue-1">
             <div class="md-toolbar-tools">
-                <h2 class="md-flex md-title">FileName: {{loadedXML.name}}</h2>
+                <h2 class="md-flex md-title">FileName: {{loadedFile.name}}</h2>
             </div>
         </md-toolbar>
         <md-content layout="column" flex class="md-padding" layout-padding="">
             <md-progress-circular ng-if="data.fileLoading" class="md-hue-2"
                                   md-mode="indeterminate"></md-progress-circular>
-            <p ng-if="!data.fileLoading">{{loadedXML.content}}</p>
-            <p ng-if="!data.fileLoading" ng-bind-html="loadedXML.content"></p>
+            <p ng-if="!data.fileLoading">{{loadedFile.content}}</p>
+            <p ng-if="!data.fileLoading" ng-bind-html="loadedFile.content"></p>
             <!--<div ng-bind-html="loaded"></div>-->
 
             <!--Alert-->

@@ -10,87 +10,38 @@ import play.sockjs.api._
 import service.MessageBroadcaster
 import scala.concurrent.Channel
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.collection.mutable.{Set => MS}
+import play.api._
+import play.api.mvc._
+import play.api.libs.iteratee.Concurrent
+import play.api.libs.iteratee.Iteratee
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import scala.collection.mutable.{Set => MS}
+import scala.concurrent._
 
 /**
   * Created by Joseph Sebastian on 19/02/2016.
   */
-class WebsocketController @Inject() (messageBroadcaster: MessageBroadcaster) extends Controller {
+class WebsocketController @Inject()(messageBroadcaster: MessageBroadcaster) extends Controller {
 
   /** Central hub for distributing chat messages */
-  val (messageOut, broadcastChannel) = Concurrent.broadcast[JsValue]
-
-  def socket = WebSocket.using[String] { request =>
-    // Log events to the console
-    //    val in = Iteratee.foreach[String](println).map { _ =>
-    //      println("Disconnected")
-    //    }
-
-    // Just consume and ignore the input
-    val in = Iteratee.consume[String]()
-
-    // Send a single 'Hello!' message
-    val out = Enumerator("Hello!")
-
-    (in, out)
-  }
 
   def sender = Action {
-    messageBroadcaster.broadcast(Json.parse("{\"test1\":2232}"));Ok
+    Ok
   }
 
-  def broadcast = WebSocket.using[String] { request =>
-    //Concurrent.broadcast returns (Enumerator, Concurrent.Channel)
-    val (out, channel) = Concurrent.broadcast[String]
-    val in = Iteratee.foreach[String] {
-      msg => println(msg)
-        channel push (s"Response:$msg")
-    }
-    (in, out)
-  }
-
-  def broadcast1 = Action {req =>
-    val (out, channel) = Concurrent.broadcast[String]
-    val in = Iteratee.foreach[String] {
-      msg => println(msg)
-        channel push (s"Response:$msg")
-    }
-    (in, out)
-    Ok.chunked(out &> EventSource()).as("text/event-stream")
-    //   Ok.chunked(messageBroadcaster.messageOut &> EventSource()).as("text/event-stream")
-  }
-  def broadcast3 = WebSocket.using[JsValue] { request =>
-    //Concurrent.broadcast returns (Enumerator, Concurrent.Channel)
-//    val (out, channel) = Concurrent.broadcast[JsValue]
-
+  def broadcast = WebSocket.using[JsValue] { _ =>
+    val (out, channel) = Concurrent.broadcast[JsValue]
+    val channelID = scala.util.Random.nextInt
+//    c.add((channelID, channel))
+    messageBroadcaster.register(channelID, channel)
     val in = Iteratee.foreach[JsValue] {
-      msg => println(msg)
-        messageBroadcaster broadcast msg
+      _ match {
+        case any => channel.push(Json.parse("thanks")) // push to current channel
+      }
     }
-    (in, messageBroadcaster.messageOut)
-  }
-
-  lazy val broadcastSockJS = SockJS.using[JsValue] { req =>
-    val in = Iteratee.foreach[JsValue] {
-      msg => println(msg)
-        messageBroadcaster broadcast msg
-    }
-    (in, messageBroadcaster.messageOut)
-  }
-
-  // it must be a `val` or `lazy val` because you are instantiating a play Router and not a
-  // classic request handler
-  lazy val sockjs = SockJSRouter.using[String] { request =>
-
-    // Log events to the console
-    val in = Iteratee.foreach[String](println).map { _ =>
-      println("Disconnected")
-    }
-
-    // Send a single 'Hello!' message and close
-    val out = Enumerator("Hello SockJS!") >>> Enumerator.eof
-
+//    }.map { _ => c.retain(x => x._1 != channelID) }
     (in, out)
   }
-
 
 }

@@ -8,7 +8,8 @@ import reactivemongo.bson._
 /**
   * Created by Joseph Sebastian on 19/01/2016.
   */
-trait MongoEntity {
+sealed trait MongoEntity {
+//  def name:String
 }
 
 case class XmlFile(uuid: Option[UUID], name: String, content: Option[String], time: Option[Date] = Some(new Date)) extends MongoEntity {
