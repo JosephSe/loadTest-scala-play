@@ -22,7 +22,7 @@ trait ResponseService {
   def saveFile(file: MongoEntity): Future[Either[String, UUID]]
 }
 
-class ResponseServiceImpl @Inject()(val xmlService: XmlService, val zipService: ZipService) extends ResponseService {
+class ResponseServiceImpl @Inject()(val xmlService: XmlService, val zipService: ZipService, fileService: FileService) extends ResponseService {
 
   lazy val reactiveMongoApi = current.injector.instanceOf[ReactiveMongoApi]
 
@@ -39,9 +39,6 @@ class ResponseServiceImpl @Inject()(val xmlService: XmlService, val zipService: 
   }
 
   override def saveFile(file: MongoEntity): Future[Either[String, UUID]] = {
-    file match {
-      case xml: XmlFile => xmlService.create(xml)
-      case zip: ZipFile => zipService.create(zip)
-    }
+    fileService.create(file)
   }
 }

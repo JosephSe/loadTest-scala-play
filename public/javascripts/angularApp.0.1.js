@@ -34,7 +34,7 @@ app.controller('AppCtrl', ['$rootScope', '$scope', '$mdSidenav', '$http', '$log'
             var ws = new WebSocket("ws://" + hostName + "/ws/broadcast");
 
             ws.onopen = function() {
-                console.log("Socket has been opened!");
+                console.log("Server socket has connection made!");
             };
 
             ws.onmessage = function(message) {
@@ -76,7 +76,8 @@ app.controller('AppCtrl', ['$rootScope', '$scope', '$mdSidenav', '$http', '$log'
                         file.newFile = false;
                         $scope.data.fileLoading = false;
                         $scope.data.loadedFile.name = data.name;
-                        $scope.data.loadedFile.content = data.content;
+                        var fileContent = $sce.trustAsHtml(data.content);
+                        $scope.data.loadedFile.content = $sce.trustAsHtml(data.content);
 //                        $scope.$apply();
                     });
                 }

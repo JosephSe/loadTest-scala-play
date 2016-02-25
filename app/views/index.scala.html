@@ -99,7 +99,7 @@
                                             <md-tooltip>{{ xml.time }}</md-tooltip>
                                         </div>
                                         <div flex="22" class="md-secondary xmlDownloadBtn">
-                                            <a ng-href="xml/{{xml.name}}">
+                                            <a ng-href="xml/{{xml.name}}.{{xml.typ}}">
                                                 <ng-md-icon class="md-avatar" icon="cloud_download" style="fill: wheat"
                                                             size="24px"
                                                             options='{"duration": 375}'></ng-md-icon>
@@ -121,7 +121,7 @@
                                             <md-tooltip>{{ zip.time }}</md-tooltip>
                                         </div>
                                         <div flex="22" class="md-secondary xmlDownloadBtn">
-                                            <a ng-href="xml/{{zip.name}}">
+                                            <a ng-href="xml/{{zip.name}}.{{zip.typ}}">
                                                 <ng-md-icon class="md-avatar" icon="cloud_download" style="fill: wheat"
                                                             size="24px"
                                                             options='{"duration": 375}'></ng-md-icon>
@@ -172,7 +172,7 @@
             <md-progress-circular ng-if="data.fileLoading" class="md-hue-2"
                                   md-mode="indeterminate"></md-progress-circular>
             <p ng-if="!data.fileLoading">{{loadedFile.content}}</p>
-            <p ng-if="!data.fileLoading" ng-bind-html="loadedFile.content"></p>
+            <!--<p ng-if="!data.fileLoading" ng-bind-html="loadedFile.content"></p>-->
             <!--<div ng-bind-html="loaded"></div>-->
 
             <!--Alert-->

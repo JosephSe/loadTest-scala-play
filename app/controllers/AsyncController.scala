@@ -49,8 +49,6 @@ class AsyncController @Inject()(val responseService: ResponseService, messageBro
       BadRequest
     }
 
-//    def saveAndSend[A, B](A, )
-
   }
 
   private def getAndBroadcast(fileName: String, id:String) = {
@@ -60,10 +58,6 @@ class AsyncController @Inject()(val responseService: ResponseService, messageBro
 //      case data: ResponseData => messageBroadcaster.broadcast(Json.toJson(data))
       case _ => println("No data found")
     }
-    //    file match {
-    //      case data:ResponseData =>messageBroadcaster.broadcast(Json.toJson(data))
-    //    }
-
   }
 
 }

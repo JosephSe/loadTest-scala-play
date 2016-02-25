@@ -1,15 +1,16 @@
 package dao
 
+import model.MongoEntity
 import play.api.Play._
 import play.api.libs.json._
 import play.modules.reactivemongo.ReactiveMongoApi
 import reactivemongo.bson.BSONDocument
 
 import scala.concurrent.Future
-import reactivemongo.api.commands.bson.BSONCountCommand.{ Count, CountResult }
+import reactivemongo.api.commands.bson.BSONCountCommand.{Count, CountResult}
 
 trait CRUDService[E, ID] {
-  def getCount(name:String):Future[Int]
+  def getCount(name: String): Future[Int]
 
   def findById(id: ID): Future[Option[E]]
 
@@ -17,7 +18,7 @@ trait CRUDService[E, ID] {
 
   def findByName(name: String): Future[Option[E]]
 
-  def getCountByName(name: String): Future[Int]
+  def findByNameRegEX(name: String): Future[List[BSONDocument]]
 
   def findByCriteria(criteria: Map[String, Any], limit: Int): Future[List[E]]
 
@@ -51,14 +52,17 @@ abstract class MongoCRUDService[E: Format, ID: Format](implicit identity: Identi
   override def findById(id: ID): Future[Option[E]] = collection.find(Json.obj(identity.name -> id)).one[E]
 
 
-//  override def findByUUID(id: String): Future[Option[E]] = collection.find(Json.obj("uuid" -> id)).one[E]
+  //  override def findByUUID(id: String): Future[Option[E]] = collection.find(Json.obj("uuid" -> id)).one[E]
 
 
   override def findByUUID(id: String): Future[Option[E]] = collection.find(Json.obj("uuid" -> id)).one[E]
 
-  override def getCountByName(name: String): Future[Int] = Future {1}
-
   override def findByName(name: String): Future[Option[E]] = collection.find(Json.obj("name" -> name)).one[E]
+
+
+  override def findByNameRegEX(name: String): Future[List[BSONDocument]] = collection.find(Json.obj("name" -> Json.obj("$regex" -> name)))
+    .cursor[BSONDocument](readPreference = ReadPreference.primary)
+    .collect[List]()
 
   override def findByCriteria(criteria: Map[String, Any], limit: Int): Future[List[E]] =
     findByCriteria(CriteriaJSONWriter.writes(criteria), limit)
@@ -83,13 +87,23 @@ abstract class MongoCRUDService[E: Format, ID: Format](implicit identity: Identi
       collect[List](limit)
   }
 
-  override def getCount(name:String):Future[Int] = {
-    val query = BSONDocument("name" -> name)
-    val command = Count(query)
-//    collection.runCommand(command).map { res =>
-//      res.value
-//    }
-    Future{1}
+  override def getCount(name: String): Future[Int] = {
+
+    /*
+        val query = BSONDocument("name" -> name)
+        val command = Count(query)
+        val result: Future[CountResult] = collection.runCommand(command)
+
+        result.map { res =>
+          val numberOfDocs: Int = res.value
+          return Future {
+            numberOfDocs
+          }
+        }
+    */
+    Future {
+      1
+    }
   }
 
   override def create(entity: E): Future[Either[String, ID]] = {

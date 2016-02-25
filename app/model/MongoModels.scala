@@ -9,10 +9,10 @@ import reactivemongo.bson._
   * Created by Joseph Sebastian on 19/01/2016.
   */
 sealed trait MongoEntity {
-//  def name:String
+  def name:String
 }
 
-case class XmlFile(uuid: Option[UUID], name: String, content: Option[String], time: Option[Date] = Some(new Date)) extends MongoEntity {
+case class XmlFile(uuid: Option[UUID], var name: String, content: Option[String], time: Option[Date] = Some(new Date)) extends MongoEntity {
   def this(name: String, content: String) = this(Some(UUID.randomUUID()), name, Some(content), Some(new Date()))
 
   def this(name: String) = this(None, name, None, None)
@@ -21,6 +21,9 @@ case class XmlFile(uuid: Option[UUID], name: String, content: Option[String], ti
     //    this(bson.getAs[UUID]("uuid"), bson.getAs[String]("name").get, bson.getAs[Boolean]("newFile").getOrElse(false), bson.getAs[String]("content"), bson.getAs[Date]("time"))
     this(Some(UUID.fromString(bson.getAs[String]("uuid").getOrElse(UUID.randomUUID().toString))), bson.getAs[String]("name").get, bson.getAs[String]("content"), Some(new Date(bson.getAs[Long]("time").get)))
   }
+
+  def this(name:String, xml:XmlFile) = this(xml.uuid, name, xml.content, xml.time)
+
 }
 
 object XmlFile {
@@ -40,12 +43,15 @@ object XmlFile {
 
 }
 
-case class ZipFile(uuid: Option[UUID], name: String, content: Option[Array[Byte]], time: Option[Date] = Some(new Date)) extends MongoEntity {
+case class ZipFile(uuid: Option[UUID], var name: String, content: Option[Array[Byte]], time: Option[Date] = Some(new Date)) extends MongoEntity {
   def this(name: String, content: Array[Byte]) = this(Some(UUID.randomUUID()), name, Some(content), Some(new Date()))
 
   def this(name: String) = this(None, name, None, None)
 
   def this(bson: BSONDocument) = this(Some(UUID.fromString(bson.getAs[String]("uuid").getOrElse(UUID.randomUUID().toString))), bson.getAs[String]("name").get, bson.getAs[Array[Byte]]("content"), Some(new Date(bson.getAs[Long]("time").get)))
+
+  def this(name:String, zip:ZipFile) = this(zip.uuid, name, zip.content, zip.time)
+
 }
 
 object ZipFile {

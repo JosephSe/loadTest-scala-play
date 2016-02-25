@@ -5,10 +5,10 @@ import java.util.UUID
 import com.google.inject.{Inject, ImplementedBy}
 import dao.{CRUDService, MongoCRUDService}
 import model.{MongoEntity, ResponseData, XmlFile, ZipFile}
-import play.api.libs.json.Json
+import play.api.libs.json.{JsObject, Json}
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{Promise, Future}
+import scala.concurrent.{Future, Promise}
 
 /**
   * Created by Joseph Sebastian on 21/01/2016.
@@ -48,6 +48,7 @@ class FileService @Inject()(xmlService: XmlService, zipService: ZipService) {
 
   /**
     * Method to load file with xml content
+    *
     * @param typ
     * @param id
     * @return
@@ -61,4 +62,45 @@ class FileService @Inject()(xmlService: XmlService, zipService: ZipService) {
       }
     }
   }
+
+  /**
+    *
+    * @param name
+    * @return
+    */
+  def loadByName(name: String): Future[Option[MongoEntity]] = {
+    if (name.contains(".")) {
+      val n = name.substring(0, name.indexOf("."))
+      name match {
+        case xml if xml.endsWith(".xml") => xmlService.findByName(n)
+        case zip if zip.endsWith(".zip") => zipService.findByName(n)
+        case _ => Future {
+          None
+        }
+      }
+    } else Future {
+      None
+    }
+  }
+
+  def create(entity: MongoEntity): Future[Either[String, UUID]] = {
+    val service = entity match {
+      case xml: XmlFile => xmlService
+      case zip: ZipFile => zipService
+    }
+    val newName = s"${entity.name}-"
+    service.findByNameRegEX(newName).flatMap {
+      case response: List[AnyRef] => {
+        val fullName = newName + (response.size + 1)
+        entity match {
+          case xml: XmlFile => xmlService.create(new XmlFile(fullName, xml))
+          case zip: ZipFile => zipService.create(new ZipFile(fullName, zip))
+        }
+      }
+      case _ => Future {
+        Left("Error saving")
+      }
+    }
+  }
+
 }

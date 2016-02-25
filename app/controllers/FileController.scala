@@ -34,11 +34,13 @@ class FileController @Inject()(fileService: FileService) extends Controller {
   }
 
   def downloadFileName(name:String) = Action.async {
-    name match {
-      case xml if name.endsWith(".xml") =>
-      case zip if name.endsWith(".zip") =>
+    fileService.loadByName(name).map {
+      case Some(xml: XmlFile) => Ok.stream(Enumerator.fromStream(new ByteArrayInputStream(xml.content.get.getBytes)).andThen(Enumerator.eof))
+      case Some(zip: ZipFile) => Ok.stream(Enumerator.fromStream(new ByteArrayInputStream(zip.content.get)).andThen(Enumerator.eof))
+      case _ => {
+        NotFound("File not found")
+      }
     }
-    Future {NotFound("")}
   }
 
   def downloadFile(typ: String, id: String) = Action.async {
