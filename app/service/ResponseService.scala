@@ -20,10 +20,6 @@ trait ResponseService {
   def all(filePrefix: String): Future[Map[String, List[ResponseData]]]
 
   def saveFile(file: MongoEntity): Future[Either[String, UUID]]
-
-  //  def saveXml(xmlFile: XmlFile): Future[Either[String, UUID]]
-
-  //  def saveZip(zipFile: ZipFile): Future[Either[String, UUID]]
 }
 
 class ResponseServiceImpl @Inject()(val xmlService: XmlService, val zipService: ZipService) extends ResponseService {
@@ -42,17 +38,6 @@ class ResponseServiceImpl @Inject()(val xmlService: XmlService, val zipService: 
     }
   }
 
-  /*
-    override def saveXml(xmlFile: XmlFile): Future[Either[String, UUID]] = {
-      xmlService.findByName(xmlFile.name).map { file =>
-      }
-      xmlService.create(xmlFile)
-    }
-
-    override def saveZip(zipFile: ZipFile): Future[Either[String, UUID]] = {
-      zipService.create(zipFile)
-    }
-  */
   override def saveFile(file: MongoEntity): Future[Either[String, UUID]] = {
     file match {
       case xml: XmlFile => xmlService.create(xml)
