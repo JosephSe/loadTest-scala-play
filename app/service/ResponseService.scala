@@ -54,7 +54,9 @@ class ResponseServiceImpl @Inject()(val xmlService: XmlService, val zipService: 
     }
   */
   override def saveFile(file: MongoEntity): Future[Either[String, UUID]] = {
-    case xml:XmlFile => xmlService.create(xml)
-    case zip:ZipFile => zipService.create(zip)
+    file match {
+      case xml: XmlFile => xmlService.create(xml)
+      case zip: ZipFile => zipService.create(zip)
+    }
   }
 }
