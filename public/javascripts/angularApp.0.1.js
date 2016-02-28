@@ -46,7 +46,7 @@ app.controller('AppCtrl', ['$rootScope', '$scope', '$mdSidenav', '$http', '$log'
                     .parent(angular.element(document.querySelector('#popupContainer')))
                     .clickOutsideToClose(true)
                     .title('Connection Lost')
-                    .textContent('Client has lost connection to server. Please reload your webpage.')
+                    .textContent('Client has lost connection with server. Please reload your web-page.')
                     .ariaLabel('Connection Lost')
                     .ok('Got it!')
                     .targetEvent(ev)
@@ -134,7 +134,7 @@ app.controller('AppCtrl', ['$rootScope', '$scope', '$mdSidenav', '$http', '$log'
 
             $scope.showSearchPopup = function(ev) {
                 var displayed = $cookieStore.get("searchPopupDisplayed")
-                displayed == undefined;
+                displayed = undefined;
                 if (displayed === undefined) {
                     $mdDialog.show({
                             controller: 'DialogController',

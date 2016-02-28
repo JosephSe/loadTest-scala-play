@@ -13,16 +13,18 @@ import scala.concurrent.duration._
  * Created by Joseph Sebastian on 28/10/2015.
  */
 class RequestLoaderActor(endpoint: String) extends Actor with ActorLogging {
-  import play.api.libs.ws._
+//  import play.api.libs.ws._
   import scala.concurrent.Future
 
   import scala.concurrent.ExecutionContext.Implicits.global
   implicit val timeout = Timeout(10 seconds)
 
   override def receive: Receive = {
-    case request: Request => sender ! loadData(request)
+    case request: Request =>
+//    case request: Request => sender ! loadData(request)
   }
 
+/*
   private def loadData(req: Request) = {
     import play.api.Play.current
     val start = System.currentTimeMillis()
@@ -39,6 +41,8 @@ class RequestLoaderActor(endpoint: String) extends Actor with ActorLogging {
     }
     response
   }
+*/
+
 //  private def loadData(req: Request) = {
 //    val request = Http(url(endpoint).setBody(req.payload).POST OK as.String)
 //    val start = System.currentTimeMillis()

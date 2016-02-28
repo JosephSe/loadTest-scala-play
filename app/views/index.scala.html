@@ -17,11 +17,11 @@
             </button>
         </div>
         <div>
-            <img src="img/kuoni2x.png" id="logo" title="Kuoni Travel" alt="Kuoni Travel" class="logo">
+            <img src="@routes.Assets.versioned("images/kuoni2x.png")" id="logo" title="Kuoni Travel" alt="Kuoni Travel" class="logo">
         </div>
         <div layout="row" layout-align="space-around center">
-            <!--<div flex="77" layout="row" layout-align="space-around center">-->
-            <h1 class="md-toolbar-tools md-raised">ASYNC response testing server</h1>
+            <!--<div flex="77" layout="row" layout-align="space-around center"> -->
+            <h1 class="md-toolbar-tools md-raised">ASYNC response testing server <p class="version">2.0</p><sup>What's New</sup></h1>
         </div>
         <div layout="row">
             <!--<div>S</div>-->
@@ -232,8 +232,8 @@
 </div>
 <!--#formatter:off-->
 <!-- Angular Material Dependencies -->
-<script src="@routes.Assets.versioned("javascripts/lib/sockjs.min.0.1.js")"></script>
-<script src="@routes.Assets.versioned("javascripts/lib/stomp.min.0.1.js")"></script>
+<script data-main="@routes.Assets.versioned("javascripts/lib/sockjs.min.0.1.js")" type="text/javascript" src="@routes.Assets.versioned("javascripts/lib/sockjs.min.0.1.js")"></script>
+<script data-main="@routes.Assets.versioned("javascripts/lib/stomp.min.0.1.js")" type="text/javascript" src="@routes.Assets.versioned("javascripts/lib/stomp.min.0.1.js")"></script>
 <!--<script src="@routes.Assets.versioned("javascripts/lib/run_prettify.js")"></script>-->
 <!--<script src="@routes.Assets.versioned("javascripts/lib/prettify.js")"></script>-->
 <!--<script src="@routes.Assets.versioned("javascripts/lib/vkbeautify.js")"></script>-->
@@ -245,7 +245,8 @@
 
 <script src="http://ajax.googleapis.com/ajax/libs/angular_material/1.0.0/angular-material.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-material-icons/0.6.0/angular-material-icons.min.js"></script>
-<script src="@routes.Assets.versioned("javascripts/angularApp.0.1.js")"></script>
+<!--<script src="@routes.Assets.versioned("javascripts/angularApp.0.1.js")"></script>-->
+<script data-main="@routes.Assets.versioned("javascripts/angularApp.0.1.js")" type="text/javascript" src="@routes.Assets.versioned("javascripts/angularApp.0.1.js")"></script>
 <!--#formatter:on-->
 </body>
 </html>

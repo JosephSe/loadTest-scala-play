@@ -1,0 +1,14 @@
+// assembly
+whatDependsOn org.apache.logging.log4j log4j-core 2.0.2
+assembly
+cd /Users/josephwork/Documents/files/others/codebase/scala/loadTest-scala/target/scala-2.11/
+sudo java -jar -Dhttp.port=80 loadTest-scala-assembly-1.0-SNAPSHOT.jar
+
+
+// MongoDB
+db.getCollection('xml').find({});
+db.xml.aggregate([
+    {$match: {'name':"JoeTest1"}},
+    {$group: {_id:null,count: {$sum:1}}}
+    ]
+);

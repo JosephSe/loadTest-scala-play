@@ -8,6 +8,10 @@
 md-toolbar h1 {
   font-weight: normal;
 }
+md-toolbar h1 .version{
+  font-weight: lighter;
+  padding-left: 10px;
+}
 md-list .md-button {
   color: inherit;
   font-weight: 500;
@@ -59,6 +63,16 @@ md-toolbar .blue {
     height: 46px;
 }
 
+h1 sup {
+    top: -0.6em;
+    padding-left: 5px;
+    font-size: small;
+    border-top-width: inherit;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    background-color:rgb(255,171,64)
+}
 /*
 .logo {
 background: url("/path") no-repeat;
