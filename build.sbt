@@ -27,7 +27,8 @@ libraryDependencies ++= Seq(
 //  "commons-logging" % "commons-logging" % "1.1.3",
   "org.scala-lang.modules" % "scala-parser-combinators_2.11" % "1.0.4",
   "org.scala-lang.modules" % "scala-xml_2.11" % "1.0.4",
-  "javax.mail" % "mail" % "1.4"
+  "javax.mail" % "mail" % "1.4",
+  "io.swagger" %% "swagger-play2" % "1.5.1"
 )
 
 resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"

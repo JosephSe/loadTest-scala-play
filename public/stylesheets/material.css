@@ -11,6 +11,7 @@ md-toolbar h1 {
 md-toolbar h1 .version{
   font-weight: lighter;
   padding-left: 10px;
+  padding-right: 5px;
 }
 md-list .md-button {
   color: inherit;
@@ -66,11 +67,13 @@ md-toolbar .blue {
 h1 sup {
     top: -0.6em;
     padding-left: 5px;
+    padding-right: 5px;
     font-size: small;
     border-top-width: inherit;
     -moz-border-radius: 5px;
     -webkit-border-radius: 5px;
     border-radius: 5px;
+
     background-color:rgb(255,171,64)
 }
 /*

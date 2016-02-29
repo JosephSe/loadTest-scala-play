@@ -1,10 +1,10 @@
 var app = angular.module('StarterApp', ['ngMaterial', 'ngMessages', 'ngMdIcons', 'ngCookies']);
 
-app.controller('AppCtrl', ['$rootScope', '$scope', '$mdSidenav', '$http', '$log', '$mdBottomSheet', '$cookieStore', '$mdDialog', 'appData', '$mdUtil', 'searchService', '$sce',
-        function($rootScope, $scope, $mdSidenav, $http, $log, $mdBottomSheet, $cookieStore, $mdDialog, appData, $mdUtil, searchService, $sce) {
+app.controller('AppCtrl', ['$rootScope', '$scope', '$mdSidenav', '$http', '$log', '$mdBottomSheet', '$cookieStore', '$mdDialog', 'appData', '$mdUtil', 'searchService', '$sce', '$mdMedia',
+        function($rootScope, $scope, $mdSidenav, $http, $log, $mdBottomSheet, $cookieStore, $mdDialog, appData, $mdUtil, searchService, $sce, $mdMedia) {
             var hostName = window.location.host;
             appData.hostName = hostName;
-            $scope.searchEnabled = false;
+            $scope.searchEnabled = true;
             $scope.stompClient = null;
             $scope.data = appData;
             $scope.fileNamePrefix = "";
@@ -26,6 +26,7 @@ app.controller('AppCtrl', ['$rootScope', '$scope', '$mdSidenav', '$http', '$log'
             }
 
             $scope.toggleRight = buildToggler('right');
+            $scope.toggleLeft = buildToggler('left');
 
             $scope.toggleSidenav = function(menuId) {
                 $mdSidenav(menuId).toggle();
@@ -34,7 +35,7 @@ app.controller('AppCtrl', ['$rootScope', '$scope', '$mdSidenav', '$http', '$log'
             var ws = new WebSocket("ws://" + hostName + "/ws/broadcast");
 
             ws.onopen = function() {
-                console.log("Server socket has connection made!");
+                console.log("Server socket connection made !!");
             };
 
             ws.onmessage = function(message) {
@@ -167,9 +168,28 @@ app.controller('AppCtrl', ['$rootScope', '$scope', '$mdSidenav', '$http', '$log'
                 //            	}
 
             };
+            $scope.showWhatsNew = function(ev) {
+                $scope.toggleLeft;
+//                var useFullScreen = ($mdMedia('sm') || $mdMedia('xs'))  && $scope.customFullscreen;
+                $mdDialog.show({
+                  controller: 'DialogController',
+                  templateUrl: '/assets/template/whatsnew.tmpl.html',
+                  parent: angular.element(document.body),
+                  targetEvent: ev,
+                  clickOutsideToClose:true,
+                  escapeToClose: true
+//                  fullscreen: useFullScreen
+                })
+                .then(function(answer) {
+                  $scope.status = 'You said the information was "' + answer + '".';
+                }, function() {
+                  $scope.status = 'You cancelled the dialog.';
+                });
+
+              };
         }
     ])
-    .controller('SearchController', function($scope, $mdBottomSheet, $http, appData, $mdSidenav, $log, searchService) {
+    .controller('SearchController', function($scope, $mdBottomSheet, $http, appData, $mdSidenav, $log, searchService, $mdDialog) {
         var self = $scope;
         var hostName = appData.hostName
         self.searchData = {};
@@ -212,14 +232,15 @@ app.controller('AppCtrl', ['$rootScope', '$scope', '$mdSidenav', '$http', '$log'
         self.findFile = function(fileName) {
             searchService.searchFile(fileName, $scope.fileNames);
         }
-        $scope.findFile = function(fileName) {
+        self.findFile = function(fileName) {
             searchService.searchFile(fileName);
         }
-
     })
     .controller('DialogController', function($scope, $mdDialog) {
         $scope.hide = function() {
-            $mdDialog.hide();
+//            $mdDialog.hide();
+            $mdDialog.hide( alert, "finished" );
+//            $mdDialog.close();
         };
         $scope.cancel = function() {
             $mdDialog.cancel();
@@ -280,7 +301,7 @@ app.controller('AppCtrl', ['$rootScope', '$scope', '$mdSidenav', '$http', '$log'
         //			.accentPalette('orange');
 
         $mdThemingProvider.theme('default')
-            .primaryPalette('blue')
+            .primaryPalette('lime')
             .accentPalette('orange')
             .warnPalette('red')
             .backgroundPalette('grey');
