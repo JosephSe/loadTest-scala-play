@@ -1,7 +1,7 @@
 var app = angular.module('StarterApp', ['ngMaterial', 'ngMessages', 'ngMdIcons', 'ngCookies']);
 
-app.controller('AppCtrl', ['$rootScope', '$scope', '$mdSidenav', '$http', '$log', '$mdBottomSheet', '$cookieStore', '$mdDialog', 'appData', '$mdUtil', 'searchService', '$sce', '$mdMedia',
-        function($rootScope, $scope, $mdSidenav, $http, $log, $mdBottomSheet, $cookieStore, $mdDialog, appData, $mdUtil, searchService, $sce, $mdMedia) {
+app.controller('AppCtrl', ['$rootScope', '$scope', '$mdSidenav', '$http', '$log', '$mdBottomSheet', '$cookieStore', '$mdDialog', 'appData', '$mdUtil', 'searchService', '$sce', '$mdMedia', '$mdToast',
+        function($rootScope, $scope, $mdSidenav, $http, $log, $mdBottomSheet, $cookieStore, $mdDialog, appData, $mdUtil, searchService, $sce, $mdMedia, $mdToast) {
             var hostName = window.location.host;
             appData.hostName = hostName;
             $scope.searchEnabled = true;
@@ -168,9 +168,21 @@ app.controller('AppCtrl', ['$rootScope', '$scope', '$mdSidenav', '$http', '$log'
                 //            	}
 
             };
-            $scope.showWhatsNew = function(ev) {
-                $scope.toggleLeft;
-//                var useFullScreen = ($mdMedia('sm') || $mdMedia('xs'))  && $scope.customFullscreen;
+            $scope.showWhatsNew = function($event) {
+                  $mdDialog.show({
+                    controller: 'DialogController',
+                    parent: angular.element(document.body),
+                    targetEvent: $event,
+                    clickOutsideToClose:true,
+//                    templateUrl: '/assets/template/whatsnew.tmpl.html'
+                    templateUrl: 'whatsnew.tmpl.html'
+                  })
+                  .then(function(answer) {
+//                        $scope.status = 'You said the information was "' + answer + '".';
+                      }, function() {
+//                        $scope.status = 'You cancelled the dialog.';
+                      });
+/*
                 $mdDialog.show({
                   controller: 'DialogController',
                   templateUrl: '/assets/template/whatsnew.tmpl.html',
@@ -178,15 +190,30 @@ app.controller('AppCtrl', ['$rootScope', '$scope', '$mdSidenav', '$http', '$log'
                   targetEvent: ev,
                   clickOutsideToClose:true,
                   escapeToClose: true
-//                  fullscreen: useFullScreen
                 })
                 .then(function(answer) {
                   $scope.status = 'You said the information was "' + answer + '".';
                 }, function() {
                   $scope.status = 'You cancelled the dialog.';
                 });
-
+*/
               };
+
+          $scope.showGridBottomSheet = function() {
+              $scope.alert = '';
+              $mdBottomSheet.show({
+                templateUrl: 'bottom-sheet-grid-template.html',
+                controller: 'GridBottomSheetCtrl',
+                clickOutsideToClose: false
+              }).then(function(clickedItem) {
+                $mdToast.show(
+                      $mdToast.simple()
+                        .textContent(clickedItem['name'] + ' clicked!')
+                        .position('top right')
+                        .hideDelay(1500)
+                    );
+              });
+            };
         }
     ])
     .controller('SearchController', function($scope, $mdBottomSheet, $http, appData, $mdSidenav, $log, searchService, $mdDialog) {
@@ -238,9 +265,7 @@ app.controller('AppCtrl', ['$rootScope', '$scope', '$mdSidenav', '$http', '$log'
     })
     .controller('DialogController', function($scope, $mdDialog) {
         $scope.hide = function() {
-//            $mdDialog.hide();
-            $mdDialog.hide( alert, "finished" );
-//            $mdDialog.close();
+            $mdDialog.hide();
         };
         $scope.cancel = function() {
             $mdDialog.cancel();
@@ -249,6 +274,29 @@ app.controller('AppCtrl', ['$rootScope', '$scope', '$mdSidenav', '$http', '$log'
             $mdDialog.hide(answer);
         };
     })
+    .controller('GridBottomSheetCtrl', function($scope, $mdBottomSheet) {
+      $scope.items = [
+        { name: 'Scala', icon: 'images/icons/scala_logo.png' },
+        { name: 'Play Framework', icon: 'images/icons/mongodb.svg' }
+      ];
+
+      $scope.listItemClick = function($index) {
+        var clickedItem = $scope.items[$index];
+        $mdBottomSheet.hide(clickedItem);
+      };
+    })
+    .run(function($http, $templateCache) {
+
+        var urls = [
+          'images/icons/scala_logo.png',
+          'images/icons/mongodb.svg'
+        ];
+
+        angular.forEach(urls, function(url) {
+          $http.get(url, {cache: $templateCache});
+        });
+
+      })
     .service('appData', function() {
         var self = this;
         self.stompClient = null;
@@ -301,7 +349,7 @@ app.controller('AppCtrl', ['$rootScope', '$scope', '$mdSidenav', '$http', '$log'
         //			.accentPalette('orange');
 
         $mdThemingProvider.theme('default')
-            .primaryPalette('lime')
+            .primaryPalette('blue-grey')
             .accentPalette('orange')
             .warnPalette('red')
             .backgroundPalette('grey');

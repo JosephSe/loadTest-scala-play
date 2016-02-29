@@ -41,9 +41,9 @@ scalacOptions += "-Ylog-classpath"
 // other, legacy style, accesses its actions statically.
 routesGenerator := InjectedRoutesGenerator
 
-(managedClasspath in Runtime) += (packageBin in Assets).value
+//(managedClasspath in Runtime) += (packageBin in Assets).value
 
-WebKeys.packagePrefix in Assets := "public/"
+//WebKeys.packagePrefix in Assets := "public/"
 
 ivyScala := ivyScala.value map {
   _.copy(overrideScalaVersion = true)

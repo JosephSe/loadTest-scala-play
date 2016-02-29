@@ -2,7 +2,7 @@
 <html lang="en" ng-app="StarterApp">
 <head>
     <!--#formatter:off-->
-    <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/angular_material/1.0.5/angular-material.min.css">
+    <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/angular_material/1.0.0/angular-material.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=RobotoDraft:300,400,500,700,400italic">
     <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/material.css")">
     <meta name="viewport" content="initial-scale=1"/>
@@ -23,8 +23,9 @@
         <div layout="row" layout-align="space-around center">
             <!--<div flex="77" layout="row" layout-align="space-around center"> -->
             <h1 class="md-toolbar-tools md-raised">ASYNC response testing server <p class="version">2.0</p>
-                <button ng-click="showWhatsNew($event)">
-                    <sup class="md-whiteframe-1dp" ng-click="showWhatsNew($event)">What's New</sup>
+                <button ng-click="showGridBottomSheet()">
+                    <!--<button ng-click="showWhatsNew($event)">-->
+                    <sup class="md-whiteframe-1dp">What's New</sup>
                 </button>
             </h1>
         </div>
@@ -59,7 +60,8 @@
     </div>
 </md-toolbar>
 <div layout="row" flex>
-    <md-sidenav layout="column" class="md-sidenav-left md-whiteframe-8dp" md-component-id="left" md-is-locked-open="$mdMedia('gt-sm')">
+    <md-sidenav layout="column" class="md-sidenav-left md-whiteframe-8dp" md-component-id="left"
+                md-is-locked-open="$mdMedia('gt-sm')">
         <md-toolbar md-scroll-shrink class="md-info md-hue-1">
             <div class="md-toolbar-tools" layout-align="center center" flex>
                 <div flex="44">
@@ -233,8 +235,43 @@
 
 
     </div>
-</div>
-<!--#formatter:off-->
+
+    <script type="text/ng-template" id="bottom-sheet-grid-template.html">
+        <md-bottom-sheet class="md-grid" layout="column" ng-cloak>
+            <div layout="row" layout-align="center center">
+                <h4>Drag down or press ESC to close</h4>
+            </div>
+            <div>
+                <md-list flex layout="row" layout-align="center center">
+                    <md-list-item ng-repeat="item in items">
+                        <img ng-src="{{item.icon}}" class="tech-image" alt="{{item.name}}">
+                    </md-list-item>
+
+                    <!--
+                                        <md-list-item ng-repeat="item in items">
+                                            <md-card>
+                                                <img ng-src="{{item.icon}}" class="md-card-image" alt="Washed Out">
+                                                <md-card-title>
+                                                    <md-card-title-text>
+                                                        <span class="md-headline">{{item.name}}</span>
+                                                    </md-card-title-text>
+                                                </md-card-title>
+                                            </md-card>
+                                        </md-list-item>
+                    -->
+                </md-list>
+                <!--
+                                    <md-list-item ng-repeat="item in items">
+                                        <md-button class="md-grid-item-content" ng-click="listItemClick($index)">
+                                            <md-icon md-png-src="{{item.icon}}"></md-icon>
+                                            <div class="md-grid-text"> {{ item.name }}</div>
+                                        </md-button>
+                                    </md-list-item>
+                -->
+            </div>
+        </md-bottom-sheet>
+    </script>
+    <!--#formatter:off-->
 <!-- Angular Material Dependencies -->
 <script data-main="@routes.Assets.versioned("javascripts/lib/sockjs.min.0.1.js")" type="text/javascript" src="@routes.Assets.versioned("javascripts/lib/sockjs.min.0.1.js")"></script>
 <script data-main="@routes.Assets.versioned("javascripts/lib/stomp.min.0.1.js")" type="text/javascript" src="@routes.Assets.versioned("javascripts/lib/stomp.min.0.1.js")"></script>
@@ -247,7 +284,7 @@
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-animate.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-aria.min.js"></script>
 
-<script src="http://ajax.googleapis.com/ajax/libs/angular_material/1.0.5/angular-material.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/angular_material/1.0.0/angular-material.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-material-icons/0.6.0/angular-material-icons.min.js"></script>
 <!--<script src="@routes.Assets.versioned("javascripts/angularApp.0.1.js")"></script>-->
 <script data-main="@routes.Assets.versioned("javascripts/angularApp.0.1.js")" type="text/javascript" src="@routes.Assets.versioned("javascripts/angularApp.0.1.js")"></script>

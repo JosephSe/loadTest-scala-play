@@ -76,6 +76,12 @@ h1 sup {
 
     background-color:rgb(255,171,64)
 }
+
+.tech-image {
+    width: 225px;
+    padding-left: 10px;
+    height: 40px;
+}
 /*
 .logo {
 background: url("/path") no-repeat;
