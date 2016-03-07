@@ -45,8 +45,8 @@ class FileController @Inject()(fileService: FileService) extends Controller {
 
   def downloadFile(typ: String, id: String) = Action.async {
     fileService.loadById(typ, id) map {
-      case Some(xml: XmlFile) => Ok.stream(Enumerator.fromStream(new ByteArrayInputStream(xml.content.get.getBytes)).andThen(Enumerator.eof))
-      case Some(zip: ZipFile) => Ok.stream(Enumerator.fromStream(new ByteArrayInputStream(zip.content.get)).andThen(Enumerator.eof))
+      case Some(xml: XmlFile) => Ok.stream(Enumerator.fromStream(new ByteArrayInputStream(xml.content.get.getBytes)).andThen(Enumerator.eof)).withHeaders(("Content-Disposition", s"attachment; filename=${xml.name}.xml"))
+      case Some(zip: ZipFile) => Ok.stream(Enumerator.fromStream(new ByteArrayInputStream(zip.content.get)).andThen(Enumerator.eof)).withHeaders(("Content-Disposition", s"attachment; filename=${zip.name}.zip"))
       case _ => NotFound("")
     }
   }

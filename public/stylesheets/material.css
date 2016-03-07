@@ -77,10 +77,17 @@ h1 sup {
     background-color:rgb(255,171,64)
 }
 
-.tech-image {
+md-list-item {
+    height: 40px;
+}
+md-list-item .image-item {
     width: 225px;
     padding-left: 10px;
     height: 40px;
+}
+
+.tech-image {
+
 }
 /*
 .logo {

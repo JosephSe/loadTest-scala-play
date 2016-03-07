@@ -12,3 +12,6 @@ db.xml.aggregate([
     {$group: {_id:null,count: {$sum:1}}}
     ]
 );
+
+
+db.getCollection('xml').remove({'name':{'$regex':'NFT'}})

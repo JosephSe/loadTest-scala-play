@@ -1,5 +1,7 @@
 package dao
 
+import java.util.UUID
+
 import model.MongoEntity
 import play.api.Play._
 import play.api.libs.json._
@@ -88,40 +90,47 @@ abstract class MongoCRUDService[E: Format, ID: Format](implicit identity: Identi
   }
 
   override def getCount(name: String): Future[Int] = {
-
-    /*
-        val query = BSONDocument("name" -> name)
-        val command = Count(query)
-        val result: Future[CountResult] = collection.runCommand(command)
-
-        result.map { res =>
-          val numberOfDocs: Int = res.value
-          return Future {
-            numberOfDocs
-          }
-        }
-    */
     Future {
       1
     }
   }
 
-  override def create(entity: E): Future[Either[String, ID]] = {
-    findByCriteria(Json.toJson(identity.clear(entity)).as[JsObject], 1).flatMap {
-      case t if t.size > 0 =>
-        Future.successful(Right(identity.of(t.head).get)) // let's be idempotent
-      case _ => {
-        val id = identity.next
-        val doc = Json.toJson(identity.set(entity, id)).as[JsObject]
-        collection.
-          insert(doc).
-          map {
-            case le if le.ok == true => Right(id)
-            case le => Left(le.message)
-          }
+  /*
+    override def create(entity: E): Future[Either[String, ID]] = {
+      findByCriteria(Json.toJson(identity.clear(entity)).as[JsObject], 1).flatMap {
+        case t if t.size > 0 =>
+          Future.successful(Right(identity.of(t.head).get)) // let's be idempotent
+        case _ => {
+          val id = identity.next
+          val doc = Json.toJson(identity.set(entity, id)).as[JsObject]
+          collection.
+            insert(doc).
+            map {
+              case le if le.ok == true => Right(id)
+              case le => Left(le.message)
+            }
+        }
       }
     }
+  */
+
+/*
+  override def create(entity: E): Future[Either[String, ID]] = {
+    val id = identity.next
+    val doc = Json.toJson(identity.set(entity, id)).as[JsObject]
+    collection.
+      insert(doc).
+      map {
+        case le if le.ok == true => Right(id)
+        case le => Left(le.message)
+      }
   }
+*/
+
+  override def create(entity: E): Future[Either[String, ID]] = Future {
+    Right(identity.next)
+  }
+
 
   override def update(id: ID, entity: E): Future[Either[String, ID]] = {
     val doc = Json.toJson(identity.set(entity, id)).as[JsObject]

@@ -18,4 +18,8 @@ class ChartController extends Controller{
     Ok(Json.toJson(responseList))
   }
 
+  def charts = Action {
+    Ok(views.html.charts(""))
+  }
+
 }

@@ -4,7 +4,7 @@ app.controller('AppCtrl', ['$rootScope', '$scope', '$mdSidenav', '$http', '$log'
         function($rootScope, $scope, $mdSidenav, $http, $log, $mdBottomSheet, $cookieStore, $mdDialog, appData, $mdUtil, searchService, $sce, $mdMedia, $mdToast) {
             var hostName = window.location.host;
             appData.hostName = hostName;
-            $scope.searchEnabled = true;
+            $scope.searchEnabled = false;
             $scope.stompClient = null;
             $scope.data = appData;
             $scope.fileNamePrefix = "";
@@ -49,7 +49,7 @@ app.controller('AppCtrl', ['$rootScope', '$scope', '$mdSidenav', '$http', '$log'
                     .title('Connection Lost')
                     .textContent('Client has lost connection with server. Please reload your web-page.')
                     .ariaLabel('Connection Lost')
-                    .ok('Got it!')
+                    .ok('Will do!')
                     .targetEvent(ev)
                 );
             };
@@ -276,8 +276,12 @@ app.controller('AppCtrl', ['$rootScope', '$scope', '$mdSidenav', '$http', '$log'
     })
     .controller('GridBottomSheetCtrl', function($scope, $mdBottomSheet) {
       $scope.items = [
-        { name: 'Scala', icon: 'images/icons/scala_logo.png' },
-        { name: 'Play Framework', icon: 'images/icons/mongodb.svg' }
+        { name: 'Scala', icon: 'images/icons/Scala_logo.png', width:"225px", height:"50px", url:"http://www.scala-lang.org"},
+        { name: 'AngularJS', icon: 'images/icons/angularLogo.png', width:"225px", height:"50px", url:"https://angularjs.org"},
+        { name: 'Play Framework', icon: 'images/icons/play_full_color.png', width:"150px", height:"50px", url:"https://www.playframework.com"},
+        { name: 'MongoDB', icon: 'images/icons/mongodb.svg', width:"300px", height:"50px", url:"https://www.mongodb.org"},
+        { name: 'Akka', icon: 'images/icons/akka.png', width:"140px", height:"40px", url:"http://akka.io/"},
+        { name: 'Reactive Mongo', icon: 'images/icons/reactive-mongo-logo.png', width:"200px", height:"45px", url:"http://reactivemongo.org/"},
       ];
 
       $scope.listItemClick = function($index) {
@@ -288,8 +292,7 @@ app.controller('AppCtrl', ['$rootScope', '$scope', '$mdSidenav', '$http', '$log'
     .run(function($http, $templateCache) {
 
         var urls = [
-          'images/icons/scala_logo.png',
-          'images/icons/mongodb.svg'
+          'images/icons/Scala_logo.png'
         ];
 
         angular.forEach(urls, function(url) {

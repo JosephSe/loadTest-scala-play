@@ -17,46 +17,39 @@
             </button>
         </div>
         <div>
-            <img src="@routes.Assets.versioned(" images/kuoni2x.png")" id="logo" title="Kuoni Travel" alt="Kuoni Travel"
+            <img src="@routes.Assets.versioned("images/kuoni2x.png")" id="logo" title="Kuoni Travel" alt="Kuoni Travel"
             class="logo">
         </div>
         <div layout="row" layout-align="space-around center">
             <!--<div flex="77" layout="row" layout-align="space-around center"> -->
             <h1 class="md-toolbar-tools md-raised">ASYNC response testing server <p class="version">2.0</p>
-                <button ng-click="showGridBottomSheet()">
-                    <!--<button ng-click="showWhatsNew($event)">-->
-                    <sup class="md-whiteframe-1dp">What's New</sup>
-                </button>
+                <!--<button ng-click="showGridBottomSheet()">-->
+                <!--<button ng-click="showWhatsNew($event)">-->
+                <a href="#" ng-click="showGridBottomSheet()">
+                    <sup class="md-whiteframe-1dp">What's New</sup></a>
+                <!--</button>-->
             </h1>
         </div>
+        <!--
+                <div layout="row">
+                    <md-tooltip>Server Connection:{{client.connected}}</md-tooltip>
+                    <md-switch ng-model="client.connected" aria-label="Connected"></md-switch>
+                </div>
+        -->
         <div layout="row">
-            <!--<div>S</div>-->
-            <md-tooltip>
-                Server Connection:{{client.connected}}
-            </md-tooltip>
-            <md-switch ng-model="client.connected" aria-label="Connected">
-                <!--<div ng-if="client.connected"><md-tooltip>Server Connected</md-tooltip></div>-->
-                <!--<div ng-if="!client.connected"><md-tooltip>Server disconnected</md-tooltip></div>-->
-            </md-switch>
-        </div>
-        <div layout="row">
-            <!--<div>A</div>-->
-            <md-tooltip>
-                Show automation files:{{client.showAutomation}}
-            </md-tooltip>
-            <md-switch ng-model="client.showAutomation" aria-label="Show automation files">
-                <!--<div ng-if="client.showAutomation">Showing</div>-->
-                <!--<div ng-if="!client.showAutomation">Not showing</div>-->
-            </md-switch>
+            <md-tooltip>Show automation files:{{client.showAutomation}}</md-tooltip>
+            <md-switch ng-model="client.showAutomation" aria-label="Show automation files"></md-switch>
         </div>
         <div flex="13">
             <md-button class="md-fab md-raised md-primary md-hue-1" ng-disabled="!searchEnabled"
                        ng-click="toggleRight()" aria-label="Search">
                 <ng-md-icon icon="search" style="fill: wheat" size="32px" options='{"duration": 375}'>Search
                 </ng-md-icon>
+                <!--<md-tooltip ng-show="!searchEnabled">Search feature coming soon</md-tooltip>-->
             </md-button>
+            <md-tooltip>Search feature coming soon</md-tooltip>
         </div>
-        <div><h5><a target="_blank" href="/api/index.html">Ver1.2</a></h5></div>
+        <!--<div><h5><a target="_blank" href="/api/index.html">Ver2.0</a></h5></div>-->
     </div>
 </md-toolbar>
 <div layout="row" flex>
@@ -105,7 +98,7 @@
                                             <md-tooltip>{{ xml.time }}</md-tooltip>
                                         </div>
                                         <div flex="22" class="md-secondary xmlDownloadBtn">
-                                            <a ng-href="xml/{{xml.name}}.{{xml.typ}}">
+                                            <a target="_blank" ng-href="file/download/{{xml.typ}}/{{xml.uuid}}">
                                                 <ng-md-icon class="md-avatar" icon="cloud_download" style="fill: wheat"
                                                             size="24px"
                                                             options='{"duration": 375}'></ng-md-icon>
@@ -127,7 +120,7 @@
                                             <md-tooltip>{{ zip.time }}</md-tooltip>
                                         </div>
                                         <div flex="22" class="md-secondary xmlDownloadBtn">
-                                            <a ng-href="xml/{{zip.name}}.{{zip.typ}}">
+                                            <a target="_blank" ng-href="file/download/{{zip.typ}}/{{zip.uuid}}">
                                                 <ng-md-icon class="md-avatar" icon="cloud_download" style="fill: wheat"
                                                             size="24px"
                                                             options='{"duration": 375}'></ng-md-icon>
@@ -241,33 +234,17 @@
             <div layout="row" layout-align="center center">
                 <h4>Drag down or press ESC to close</h4>
             </div>
+            <div layout="row" layout-align="center center">
+                <h5>Completely new tech stack</h5>
+            </div>
             <div>
                 <md-list flex layout="row" layout-align="center center">
-                    <md-list-item ng-repeat="item in items">
-                        <img ng-src="{{item.icon}}" class="tech-image" alt="{{item.name}}">
+                    <md-list-item ng-repeat="item in items" class="image-item">
+                        <a target="_blank" href="{{item.url}}">
+                            <img ng-src="{{item.icon}}" class="tech-image" alt="{{item.name}}" width="{{item.width}}"height="{{item.height}}">
+                        </a>
                     </md-list-item>
-
-                    <!--
-                                        <md-list-item ng-repeat="item in items">
-                                            <md-card>
-                                                <img ng-src="{{item.icon}}" class="md-card-image" alt="Washed Out">
-                                                <md-card-title>
-                                                    <md-card-title-text>
-                                                        <span class="md-headline">{{item.name}}</span>
-                                                    </md-card-title-text>
-                                                </md-card-title>
-                                            </md-card>
-                                        </md-list-item>
-                    -->
                 </md-list>
-                <!--
-                                    <md-list-item ng-repeat="item in items">
-                                        <md-button class="md-grid-item-content" ng-click="listItemClick($index)">
-                                            <md-icon md-png-src="{{item.icon}}"></md-icon>
-                                            <div class="md-grid-text"> {{ item.name }}</div>
-                                        </md-button>
-                                    </md-list-item>
-                -->
             </div>
         </md-bottom-sheet>
     </script>

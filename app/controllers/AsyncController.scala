@@ -2,7 +2,7 @@ package controllers
 
 import javax.inject.Inject
 
-import io.swagger.annotations.{ApiOperation, ApiResponses, ApiResponse, Api}
+//import io.swagger.annotations.{ApiOperation, ApiResponses, ApiResponse, Api}
 import model.{ResponseData, XmlFile, ZipFile}
 import play.api.libs.json.Json
 import play.api.mvc.{Results, Action, Controller}

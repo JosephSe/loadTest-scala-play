@@ -1,6 +1,6 @@
 name := """loadTest-scala"""
 
-version := "1.0-SNAPSHOT"
+version := "2.1-SNAPSHOT"
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala).enablePlugins(SbtWeb)
 
@@ -27,13 +27,11 @@ libraryDependencies ++= Seq(
 //  "commons-logging" % "commons-logging" % "1.1.3",
   "org.scala-lang.modules" % "scala-parser-combinators_2.11" % "1.0.4",
   "org.scala-lang.modules" % "scala-xml_2.11" % "1.0.4",
-  "javax.mail" % "mail" % "1.4",
-  "io.swagger" %% "swagger-play2" % "1.5.1"
+  "javax.mail" % "mail" % "1.4"
+//  "io.swagger" %% "swagger-play2" % "1.5.1"
 )
 
 resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"
-
-//resolvers += Resolver.sonatypeRepo("releases")
 
 scalacOptions += "-Ylog-classpath"
 
@@ -41,9 +39,9 @@ scalacOptions += "-Ylog-classpath"
 // other, legacy style, accesses its actions statically.
 routesGenerator := InjectedRoutesGenerator
 
-//(managedClasspath in Runtime) += (packageBin in Assets).value
+(managedClasspath in Runtime) += (packageBin in Assets).value
 
-//WebKeys.packagePrefix in Assets := "public/"
+WebKeys.packagePrefix in Assets := "public/"
 
 ivyScala := ivyScala.value map {
   _.copy(overrideScalaVersion = true)

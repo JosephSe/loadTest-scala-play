@@ -17,4 +17,4 @@ addSbtPlugin("com.typesafe.sbt" % "sbt-mocha" % "1.1.0")
 
 addSbtPlugin("net.virtual-void" % "sbt-dependency-graph" % "0.8.1")
 
-//addSbtPlugin("com.jamesward" % "play-auto-refresh" % "0.0.13")
+addSbtPlugin("com.jamesward" % "play-auto-refresh" % "0.0.13")
