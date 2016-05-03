@@ -1,7 +1,6 @@
 package actors
 
-import akka.actor.{Props, ActorRef, Actor}
-import akka.actor.Actor.Receive
+import akka.actor.{Actor, ActorRef, Props}
 
 /**
   * Created by Joseph Sebastian on 19/02/2016.

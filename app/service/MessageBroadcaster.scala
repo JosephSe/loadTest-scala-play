@@ -1,13 +1,10 @@
 package service
 
 import com.google.inject.ImplementedBy
-import play.api.libs.iteratee.{Concurrent, Iteratee, Enumerator}
-import play.api.libs.json.{Json, JsValue}
+import play.api.libs.iteratee.Concurrent
+import play.api.libs.json.JsValue
 
 import scala.collection.mutable.Set
-import scala.concurrent.Channel
-
-import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
   * Created by Joseph Sebastian on 19/02/2016.

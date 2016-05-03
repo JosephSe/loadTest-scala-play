@@ -15,3 +15,16 @@ db.xml.aggregate([
 
 
 db.getCollection('xml').remove({'name':{'$regex':'NFT'}})
+
+
+
+#HTML
+                    <div layout="row" layout-align="center center">
+                        <h4>Got some feedback?? I'd love to hear. Please click</h4>
+                        <img ng-src="images/icons/joe.gif" class="tech-image" alt="Joseph Sebastian" width="150" height="250">
+                    </div>
+
+
+#TODO
+
+curl -v -s --trace-ascii http_trace.log --data-binary ~/Desktop/JCache2-1.zip -H "Content-Type: application/zip" -H "Content-Encoding: gzip" -X POST http://httpbin.org/post

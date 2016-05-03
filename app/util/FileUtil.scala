@@ -10,8 +10,7 @@ import scala.io.Source
 /**
  * Created by Joseph Sebastian on 17/11/2015.
  */
-@Singleton
-class FileUtil {
+object FileUtil {
 
   def loadFile(file:InputStream) = {
     LoadTestData(Source.fromInputStream(file).getLines())

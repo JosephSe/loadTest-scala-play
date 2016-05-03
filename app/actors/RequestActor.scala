@@ -1,19 +1,14 @@
 package actors
 
 import java.text.SimpleDateFormat
-import java.util.Date
 
 import akka.actor._
-import _root_.dispatch.Defaults
-import akka.actor.Actor.Receive
+import akka.pattern.ask
 import akka.util.Timeout
-import dispatch._, Defaults._
-import model.{RawResponses, ServerResponseData, Response, Request}
+import model.{RawResponses, Request, ServerResponseData}
+
 import scala.concurrent.Await
 import scala.concurrent.duration._
-
-import akka.pattern.ask
-
 import scala.xml.XML
 
 trait RequestProcessor {

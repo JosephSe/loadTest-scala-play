@@ -1,9 +1,8 @@
 package actors.camel
 
-import akka.actor.Actor.Receive
 import akka.actor.ActorLogging
 import akka.camel.{CamelMessage, Consumer}
-
+import play.api.Logger._
 /**
  * Created by Joseph Sebastian on 22/12/2015.
  */
@@ -13,6 +12,6 @@ class BookingEngineConsumer extends Consumer with ActorLogging {
   override def receive: Receive = {
     case msg:CamelMessage =>
       println(msg)
-    case _ => println("Unknown message recieved")
+    case _ => debug("Unknown message recieved")
   }
 }

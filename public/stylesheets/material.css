@@ -64,7 +64,7 @@ md-toolbar .blue {
     height: 46px;
 }
 
-h1 sup {
+sup {
     top: -0.6em;
     padding-left: 5px;
     padding-right: 5px;
@@ -88,6 +88,10 @@ md-list-item .image-item {
 
 .tech-image {
 
+}
+
+md-bottom-sheet.md-grid {
+    padding-bottom:0px;
 }
 /*
 .logo {

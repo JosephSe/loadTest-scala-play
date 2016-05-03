@@ -1,6 +1,6 @@
-name := """loadTest-scala"""
+name := """async-server-scala"""
 
-version := "2.1-SNAPSHOT"
+version := "2.0.1-SNAPSHOT"
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala).enablePlugins(SbtWeb)
 
@@ -10,7 +10,8 @@ libraryDependencies ++= Seq(
 //  cache,
 //  ws,
   specs2 % Test,
-  "org.reactivemongo" %% "play2-reactivemongo" % "0.11.9" exclude("org.apache.logging.log4j", "log4j-core"),
+  filters,
+  "org.reactivemongo" %% "play2-reactivemongo" % "0.11.11" exclude("org.apache.logging.log4j", "log4j-core"),
   "net.databinder.dispatch" % "dispatch-core_2.11" % "0.11.3",
   "com.typesafe" % "config" % "1.3.0",
   "com.typesafe.akka" % "akka-actor_2.11" % "2.3.9",
@@ -46,5 +47,7 @@ WebKeys.packagePrefix in Assets := "public/"
 ivyScala := ivyScala.value map {
   _.copy(overrideScalaVersion = true)
 }
+
+javaOptions in run += "-Xmx4G"
 
 fork in run := true

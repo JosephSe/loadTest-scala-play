@@ -1,12 +1,9 @@
 package actors
 
-import _root_.dispatch.url
 import akka.actor.{Actor, ActorLogging}
 import akka.util.Timeout
-import dispatch.{Http, as, url}
-import model.{RawSearchResponse, ServerResponseData, Request}
+import model.Request
 
-import scala.concurrent.Await
 import scala.concurrent.duration._
 
 /**
@@ -14,9 +11,6 @@ import scala.concurrent.duration._
  */
 class RequestLoaderActor(endpoint: String) extends Actor with ActorLogging {
 //  import play.api.libs.ws._
-  import scala.concurrent.Future
-
-  import scala.concurrent.ExecutionContext.Implicits.global
   implicit val timeout = Timeout(10 seconds)
 
   override def receive: Receive = {

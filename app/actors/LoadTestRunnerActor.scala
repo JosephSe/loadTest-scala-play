@@ -1,6 +1,6 @@
 package actors
 
-import akka.actor.{ActorLogging, Actor, ActorRef, Props}
+import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import akka.routing.RoundRobinPool
 import akka.util.Timeout
 import model.{LoadTestData, Request}

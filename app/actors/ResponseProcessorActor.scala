@@ -1,12 +1,10 @@
 package actors
 
-import java.util.Date
-
 import akka.actor.{Actor, ActorRef}
 import model._
 
 import scala.xml.{Elem, XML}
-
+import play.api.Logger._
 /**
  * Created by Joseph Sebastian on 19/11/2015.
  */
@@ -33,7 +31,7 @@ trait HotelResponseProcessor extends ResponseProcessor {
           maxPrice = price
         }
       }
-      println(maxRoomCatId, maxPrice)
+      debug(s"$maxRoomCatId, $maxPrice")
 
       (maxRoomCatId, maxPrice)
     }

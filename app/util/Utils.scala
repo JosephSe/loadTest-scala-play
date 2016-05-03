@@ -1,7 +1,7 @@
 package util
 
 import java.text.SimpleDateFormat
-import java.util.{Calendar, Date}
+import java.util.Date
 
 /**
   * Created by Joseph Sebastian on 26/01/2016.

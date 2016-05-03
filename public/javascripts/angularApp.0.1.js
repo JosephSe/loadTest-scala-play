@@ -58,8 +58,14 @@ app.controller('AppCtrl', ['$rootScope', '$scope', '$mdSidenav', '$http', '$log'
                 console.log("Received data from websocket: ", data);
                 if ($scope.fileNamePrefix === "" || data.fileName.indexOf($scope.fileNamePrefix) === 0) {
                     //    $scope.updateUI(data);
-                    if (data.typ === "xml") appData.xmls.push(data);
-                    else appData.zips.push(data);
+                    if (data.typ === "xml") {
+                        addToCollection(appData.xmls, data)
+//                        appData.xmls.push(data);
+                    }
+                    else {
+                        addToCollection(appData.zips, data)
+//                        appData.zips.push(data);
+                    }
                     $scope.$apply();
                 }
             }
@@ -68,7 +74,7 @@ app.controller('AppCtrl', ['$rootScope', '$scope', '$mdSidenav', '$http', '$log'
                 if(file.typ === "zip") {
                     $scope.data.loadedFile.name = file.name;
                     $scope.data.loadedFile.content = "Preview option is not available for this file type. Please use the download link";
-//                    $scope.$apply();
+                    file.newFile = false;
                 } else {
                     $scope.data.fileLoading = true;
                     $scope.data.clearLoadedXML;
@@ -79,7 +85,6 @@ app.controller('AppCtrl', ['$rootScope', '$scope', '$mdSidenav', '$http', '$log'
                         $scope.data.loadedFile.name = data.name;
                         var fileContent = $sce.trustAsHtml(data.content);
                         $scope.data.loadedFile.content = $sce.trustAsHtml(data.content);
-//                        $scope.$apply();
                     });
                 }
             };
@@ -153,21 +158,32 @@ app.controller('AppCtrl', ['$rootScope', '$scope', '$mdSidenav', '$http', '$log'
             }
 
             $scope.updateUI = function(xmlData) {
-                //                if(!$scope.client.showAutomation && (xmlData.fileName.indexOf('automationTest-') == 0 || xmlData.fileName.indexOf('TSTJ_BBC3_') == 0)) {
-                //                    show nothing
-                //                } else {
+/*
+
+                                if(!$scope.client.showAutomation && (xmlData.fileName.indexOf('automationTest-') == 0 || xmlData.fileName.indexOf('TSTJ_BBC3_') == 0)) {
+                                    //show nothing
+                                } else {
+*/
                 for (i = 0; i < xmlData.xml.length; i++) {
-                    appData.xmls.push(xmlData.xml[i]);
+                    addToCollection(appData.xmls, xmlData.xml[i])
+//                    appData.xmls.push(xmlData.xml[i]);
                 }
                 for (i = 0; i < xmlData.zip.length; i++) {
                     appData.zips.push(xmlData.zip[i]);
                 }
-
-                //                    if(xmlData.typ ==="xml") appData.xmls.push(xmlData);
-                //                    else appData.zips.push(xmlData);
-                //            	}
+//              }
 
             };
+
+            function addToCollection(array, item) {
+                if(!$scope.client.showAutomation && (item.name.indexOf('automationTest-') == 0 || item.name.indexOf('TSTJ_BBC3_') == 0)) {
+                    //Dont add
+                } else {
+                    array.push(item);
+                }
+
+            };
+
             $scope.showWhatsNew = function($event) {
                   $mdDialog.show({
                     controller: 'DialogController',

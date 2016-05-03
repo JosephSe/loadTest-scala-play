@@ -1,22 +1,43 @@
 <configuration>
-    
-  <conversionRule conversionWord="coloredLevel" converterClass="play.api.Logger$ColoredLevel" />
 
-  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-    <encoder>
-      <pattern>%coloredLevel - %logger - %message%n%xException</pattern>
-    </encoder>
-  </appender>
+    <conversionRule conversionWord="coloredLevel" converterClass="play.api.Logger$ColoredLevel"/>
 
-  <!--
-    The logger name is typically the Java/Scala package name.
-    This configures the log level to log at for a package and its children packages.
-  -->
-  <logger name="play" level="INFO" />
-  <logger name="application" level="DEBUG" />
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${user.dir}/logs/application.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- Daily rollover with compression -->
+            <fileNamePattern>application-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <!-- keep 30 days worth of history -->
+            <maxHistory>5</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%date{yyyy-MM-dd HH:mm:ss ZZZZ} - [%level] - from %logger in %thread %n%message%n%xException%n
+            </pattern>
+        </encoder>
+    </appender>
 
-  <root level="ERROR">
-    <appender-ref ref="STDOUT" />
-  </root>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%coloredLevel %logger{15} - %message%n%xException{5}</pattern>
+        </encoder>
+    </appender>
+
+    <root level="ERROR">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILE"/>
+    </root>
+
+    <logger name="play" level="DEBUG">
+        <appender-ref ref="STDOUT"/>
+    </logger>
+
+    <logger name="application" level="DEBUG">
+        <appender-ref ref="STDOUT"/>
+    </logger>
+
+    <logger name="actors" level="DEBUG"/>
+    <logger name="models" level="DEBUG"/>
+
+    <!--<logger name="com.avaje.ebean.config.PropertyMapLoader" level="OFF"/>-->
 
 </configuration>

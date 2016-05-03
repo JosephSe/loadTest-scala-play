@@ -2,13 +2,12 @@ package service
 
 import java.util.UUID
 
-import com.google.inject.{Inject, ImplementedBy}
+import com.google.inject.{ImplementedBy, Inject}
 import dao.{CRUDService, MongoCRUDService}
-import model.{MongoEntity, ResponseData, XmlFile, ZipFile}
-import play.api.libs.json.{JsObject, Json}
+import model.{MongoEntity, XmlFile, ZipFile}
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{Future, Promise}
+import scala.concurrent.Future
 
 /**
   * Created by Joseph Sebastian on 21/01/2016.
@@ -83,7 +82,7 @@ class FileService @Inject()(xmlService: XmlService, zipService: ZipService) {
     }
   }
 
-  def create(entity: MongoEntity): Future[Either[String, UUID]] = {
+  def create(entity: MongoEntity): Future[Either[String, MongoEntity]] = {
     val service = entity match {
       case xml: XmlFile => xmlService
       case zip: ZipFile => zipService
@@ -92,9 +91,19 @@ class FileService @Inject()(xmlService: XmlService, zipService: ZipService) {
     service.findByNameRegEX(newName).flatMap {
       case response: List[AnyRef] => {
         val fullName = newName + (response.size + 1)
-        entity match {
-          case xml: XmlFile => xmlService.create(new XmlFile(fullName, xml))
-          case zip: ZipFile => zipService.create(new ZipFile(fullName, zip))
+
+        val savedEntity = entity match {
+          case xml: XmlFile =>
+            val file = xml.copy(name = fullName)
+            xmlService.create(file)
+            file
+          case zip: ZipFile =>
+            val file = zip.copy(name = fullName)
+            zipService.create(file)
+            file
+        }
+        Future {
+          Right(savedEntity)
         }
       }
       case _ => Future {

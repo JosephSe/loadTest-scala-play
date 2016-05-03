@@ -8,10 +8,12 @@ import service.LoadTestService
 /**
  * Created by Joseph Sebastian on 13/11/2015.
  */
-class LoadTestController @Inject() (loadTestService: LoadTestService) extends  Controller {
+class LoadTestController extends  Controller {
+//class LoadTestController @Inject() (loadTestService: LoadTestService) extends  Controller {
 
   def run = Action {
-    Ok(loadTestService.run)
+//    Ok(loadTestService.run)
+    Ok
   }
 
 }

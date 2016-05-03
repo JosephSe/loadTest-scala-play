@@ -1,14 +1,10 @@
 package actors
 
-import javax.inject.Inject
-
-import akka.actor.{PoisonPill, ActorSystem, Props, Actor}
-import akka.actor.Actor.Receive
+import akka.actor.{Actor, PoisonPill, Props, _}
 import akka.routing.RoundRobinPool
-import model.{RawResponses, ProcessedResponses, Response}
+import model.{ProcessedResponses, RawResponses}
 import play.api.Play._
-import akka.actor._
-
+import play.api.Logger._
 
 /**
  * Created by Joseph Sebastian on 17/11/2015.
@@ -25,7 +21,7 @@ class ResponseHandlerActor(count:Int) extends Actor {
       processorActor ! response
     case processedResponse: ProcessedResponses =>
       initCount += 1
-      println(processedResponse)
+      debug(processedResponse.toString)
       if (count == initCount) self ! PoisonPill
   }
 }

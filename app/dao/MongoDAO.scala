@@ -1,15 +1,11 @@
 package dao
 
-import java.util.UUID
-
-import model.MongoEntity
 import play.api.Play._
 import play.api.libs.json._
 import play.modules.reactivemongo.ReactiveMongoApi
 import reactivemongo.bson.BSONDocument
 
 import scala.concurrent.Future
-import reactivemongo.api.commands.bson.BSONCountCommand.{Count, CountResult}
 
 trait CRUDService[E, ID] {
   def getCount(name: String): Future[Int]
@@ -72,8 +68,9 @@ abstract class MongoCRUDService[E: Format, ID: Format](implicit identity: Identi
   protected def findByCritAndFields(criteria: Map[String, Any], fields: List[String]): Future[List[BSONDocument]] = {
     val filter = JsObject(fields.map(_ -> JsNumber(1)).toSeq)
     collection.genericQueryBuilder.query(CriteriaJSONWriter.writes(criteria)).projection(filter)
+        .sort(Json.obj("time" -> -1))
       .cursor[BSONDocument](readPreference = ReadPreference.primary)
-      .collect[List]()
+      .collect[List](50)
   }
 
   private def findByCriteria(criteria: JsObject, limit: Int): Future[List[E]] = {
@@ -114,7 +111,6 @@ abstract class MongoCRUDService[E: Format, ID: Format](implicit identity: Identi
     }
   */
 
-/*
   override def create(entity: E): Future[Either[String, ID]] = {
     val id = identity.next
     val doc = Json.toJson(identity.set(entity, id)).as[JsObject]
@@ -125,11 +121,12 @@ abstract class MongoCRUDService[E: Format, ID: Format](implicit identity: Identi
         case le => Left(le.message)
       }
   }
-*/
 
+  /*
   override def create(entity: E): Future[Either[String, ID]] = Future {
     Right(identity.next)
   }
+  */
 
 
   override def update(id: ID, entity: E): Future[Either[String, ID]] = {

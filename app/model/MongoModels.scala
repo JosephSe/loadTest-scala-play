@@ -10,6 +10,7 @@ import reactivemongo.bson._
   */
 sealed trait MongoEntity {
   def name:String
+  def uuid:Option[UUID]
 }
 
 case class XmlFile(uuid: Option[UUID], var name: String, content: Option[String], time: Option[Date] = Some(new Date)) extends MongoEntity {
@@ -22,7 +23,7 @@ case class XmlFile(uuid: Option[UUID], var name: String, content: Option[String]
     this(Some(UUID.fromString(bson.getAs[String]("uuid").getOrElse(UUID.randomUUID().toString))), bson.getAs[String]("name").get, bson.getAs[String]("content"), Some(new Date(bson.getAs[Long]("time").get)))
   }
 
-  def this(name:String, xml:XmlFile) = this(xml.uuid, name, xml.content, xml.time)
+//  def this(name:String, xml:XmlFile) = this(xml.uuid, name, xml.content, xml.time)
 
 }
 
@@ -36,7 +37,7 @@ object XmlFile {
 
     override def of(entity: XmlFile): Option[UUID] = entity.uuid
 
-    override def set(entity: XmlFile, id: UUID): XmlFile = entity.copy(uuid = Option(id))
+    override def set(entity: XmlFile, id: UUID): XmlFile = if(!entity.uuid.isDefined) entity.copy(uuid = Option(id)) else entity
 
     override def clear(entity: XmlFile): XmlFile = entity.copy(uuid = None)
   }
@@ -50,7 +51,7 @@ case class ZipFile(uuid: Option[UUID], var name: String, content: Option[Array[B
 
   def this(bson: BSONDocument) = this(Some(UUID.fromString(bson.getAs[String]("uuid").getOrElse(UUID.randomUUID().toString))), bson.getAs[String]("name").get, bson.getAs[Array[Byte]]("content"), Some(new Date(bson.getAs[Long]("time").get)))
 
-  def this(name:String, zip:ZipFile) = this(zip.uuid, name, zip.content, zip.time)
+//  def this(name:String, zip:ZipFile) = this(zip.uuid, name, zip.content, zip.time)
 
 }
 
@@ -64,7 +65,7 @@ object ZipFile {
 
     override def of(entity: ZipFile): Option[UUID] = entity.uuid
 
-    override def set(entity: ZipFile, id: UUID): ZipFile = entity.copy(uuid = Option(id))
+    override def set(entity: ZipFile, id: UUID): ZipFile = if(!entity.uuid.isDefined) entity.copy(uuid = Option(id)) else entity
 
     override def clear(entity: ZipFile): ZipFile = entity.copy(uuid = None)
   }

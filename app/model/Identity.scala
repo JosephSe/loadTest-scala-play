@@ -1,7 +1,5 @@
 package model
 
-import java.util.UUID
-
 /**
   * Created by Joseph Sebastian on 20/01/2016.
   */
