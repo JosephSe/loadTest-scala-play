@@ -101,3 +101,13 @@ height: 100px;
 display: block; text-indent: -9999px;
 }
 */
+
+/*
+md-card .height {
+    height : 275px;
+}
+*/
+
+md-card canvas {
+    padding-top : 10px;
+}

@@ -7,15 +7,17 @@ package controllers
 import java.io.ByteArrayInputStream
 import javax.inject.Inject
 
-import model.{ResponseData, XmlFile, ZipFile}
+import model.{MongoEntity, ResponseData, XmlFile, ZipFile}
+import play.api.cache.CacheApi
 import play.api.libs.iteratee.Enumerator
 import play.api.libs.json.Json
 import play.api.mvc.{Action, Controller}
 import service.FileService
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
-class FileController @Inject()(fileService: FileService) extends Controller {
+class FileController @Inject()(fileService: FileService, cache: CacheApi) extends Controller {
 
   def getFile(typ: String, id: String) = Action.async {
     fileService.findByNameAndId(typ, id) map {

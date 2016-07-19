@@ -28,3 +28,47 @@ db.getCollection('xml').remove({'name':{'$regex':'NFT'}})
 #TODO
 
 curl -v -s --trace-ascii http_trace.log --data-binary ~/Desktop/JCache2-1.zip -H "Content-Type: application/zip" -H "Content-Encoding: gzip" -X POST http://httpbin.org/post
+
+
+
+[error] p.c.s.n.PlayRequestHandler - Exception caught in Netty
+io.netty.handler.codec.compression.DecompressionException: Input is not in the GZIP format
+	at io.netty.handler.codec.compression.JdkZlibDecoder.readGZIPHeader(JdkZlibDecoder.java:253)
+	at io.netty.handler.codec.compression.JdkZlibDecoder.decode(JdkZlibDecoder.java:153)
+	at io.netty.handler.codec.ByteToMessageDecoder.callDecode(ByteToMessageDecoder.java:369)
+	at io.netty.handler.codec.ByteToMessageDecoder.channelRead(ByteToMessageDecoder.java:244)
+	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:292)
+[info] application - ReactiveMongoApi starting...
+[error] p.c.s.n.PlayRequestHandler - Exception caught in Netty
+io.netty.handler.codec.compression.DecompressionException: Input is not in the GZIP format
+	at io.netty.handler.codec.compression.JdkZlibDecoder.readGZIPHeader(JdkZlibDecoder.java:253)
+	at io.netty.handler.codec.compression.JdkZlibDecoder.decode(JdkZlibDecoder.java:153)
+	at io.netty.handler.codec.ByteToMessageDecoder.callDecode(ByteToMessageDecoder.java:369)
+	at io.netty.handler.codec.ByteToMessageDecoder.channelRead(ByteToMessageDecoder.java:244)
+	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:292)
+[info] application - ReactiveMongoApi starting...
+[error] p.c.s.n.PlayRequestHandler - Exception caught in Netty
+io.netty.handler.codec.compression.DecompressionException: Input is not in the GZIP format
+	at io.netty.handler.codec.compression.JdkZlibDecoder.readGZIPHeader(JdkZlibDecoder.java:253)
+	at io.netty.handler.codec.compression.JdkZlibDecoder.decode(JdkZlibDecoder.java:153)
+	at io.netty.handler.codec.ByteToMessageDecoder.callDecode(ByteToMessageDecoder.java:369)
+	at io.netty.handler.codec.ByteToMessageDecoder.channelInactive(ByteToMessageDecoder.java:311)
+	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelInactive(AbstractChannelHandlerContext.java:193)
+[error] p.c.s.n.PlayRequestHandler - Exception caught in Netty
+io.netty.handler.codec.compression.DecompressionException: Input is not in the GZIP format
+	at io.netty.handler.codec.compression.JdkZlibDecoder.readGZIPHeader(JdkZlibDecoder.java:253)
+	at io.netty.handler.codec.compression.JdkZlibDecoder.decode(JdkZlibDecoder.java:153)
+	at io.netty.handler.codec.ByteToMessageDecoder.callDecode(ByteToMessageDecoder.java:369)
+	at io.netty.handler.codec.ByteToMessageDecoder.channelInactive(ByteToMessageDecoder.java:311)
+	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelInactive(AbstractChannelHandlerContext.java:193)
+[info] application - ReactiveMongoApi successfully config
+
+Spring headers - {Content-Encoding=[gzip], Connection=[keep-alive], Host=[10.241.120.43:8080], Content-Length=[1366], File-Name=[DC_XA_T_022_22-146669886794732530.zip], Content-Type=[application/zip]}
+
+
+curl -XPOST --show-error http://longscm01n:9090/job/Nova_Comparison_SIT/build
+
+
+http://longscm01n:9090/job/HTML_Pricing_SIT/129/testReport/api/json?pretty=true
+
+layout-padding layout-margin layout-fill layout-wrap

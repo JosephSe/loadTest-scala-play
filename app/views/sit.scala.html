@@ -22,35 +22,9 @@
         <!--#formatter:om-->
             </div>
         <div layout="row" layout-align="space-around center">
-            <!--<div flex="77" layout="row" layout-align="space-around center"> -->
-            <h1 class="md-toolbar-tools md-raised">ASYNC response testing server <p class="version">2.0</p>
-                <!--<button ng-click="showGridBottomSheet()">-->
-                <!--<button ng-click="showWhatsNew($event)">-->
-                <a href="#" ng-click="showGridBottomSheet()">
-                    <sup class="md-whiteframe-1dp">What's New</sup></a>
-                <!--</button>-->
+            <h1 class="md-toolbar-tools md-raised">SIT test status <p class="version">1.0</p>
             </h1>
         </div>
-        <!--
-                <div layout="row">
-                    <md-tooltip>Server Connection:{{client.connected}}</md-tooltip>
-                    <md-switch ng-model="client.connected" aria-label="Connected"></md-switch>
-                </div>
-        -->
-        <div layout="row">
-            <md-tooltip>Show automation files:{{client.showAutomation}}</md-tooltip>
-            <md-switch ng-model="client.showAutomation" aria-label="Show automation files"></md-switch>
-        </div>
-        <div flex="13">
-            <md-button class="md-fab md-raised md-primary md-hue-1" ng-disabled="!searchEnabled"
-                       ng-click="toggleRight()" aria-label="Search">
-                <ng-md-icon icon="search" style="fill: wheat" size="32px" options='{"duration": 375}'>Search
-                </ng-md-icon>
-                <!--<md-tooltip ng-show="!searchEnabled">Search feature coming soon</md-tooltip>-->
-            </md-button>
-            <md-tooltip>Search feature coming soon</md-tooltip>
-        </div>
-        <!--<div><h5><a target="_blank" href="/api/index.html">Ver2.0</a></h5></div>-->
     </div>
 </md-toolbar>
 <div layout="row" flex>
@@ -59,16 +33,7 @@
         <md-toolbar md-scroll-shrink class="md-info md-hue-1">
             <div class="md-toolbar-tools" layout-align="center center" flex>
                 <div flex="44">
-                    <h5 class="md-title">Files received</h5>
-                </div>
-                <div flex="33" layout-align="right center">
-                    <md-button ng-disabled="client.allLoaded" class="md-raised md-primary md-hue-1"
-                               ng-click="loadAll()" aria-label="Load all">
-                        <ng-md-icon icon="list" style="fill: wheat" size="32px"
-                                    options='{"duration": 375}'>
-                            <md-tooltip>Load all</md-tooltip>
-                        </ng-md-icon>
-                    </md-button>
+                    <h5 class="md-title">Jobs</h5>
                 </div>
                 <div flex="22" layout-align="right right">
                     <md-button ng-if="!$client.allLoaded" class="md-accent" ng-click="clearAll()"

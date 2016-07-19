@@ -1,0 +1,77 @@
+@(message: String)
+<html lang="en" ng-app="StarterApp">
+<head>
+    <!--#formatter:off-->
+<!--
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=RobotoDraft:300,400,500,700,400italic">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.10/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/lib/angular-chart.css")">
+    <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/load.css")">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+-->
+    <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/angular_material/1.0.0/angular-material.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=RobotoDraft:300,400,500,700,400italic">
+    <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/load.css")">
+    <!--<link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/material.css")">-->
+    <meta name="viewport" content="initial-scale=1"/>
+    <!--#formatter:on-->
+    <title>SIT dashboard</title>
+</head>
+<body layout="column" ng-controller="AppCtrl">
+
+<md-toolbar>
+    <div layout="row" layout-align="space-around center">
+        <div layout="row" layout-align="space-around center">
+            <h1 class="md-toolbar-tools md-raised">ASYNC response testing server <p class="version">2.0</p></h1>
+        </div>
+    </div>
+</md-toolbar>
+
+<div layout-gt-md="row" flex ng-init="initChart()">
+<!--<div layout="row" flex ng-init="initChart()">-->
+    <div layout="row" flex id="content">
+        <div class="col-xs-offset-5 col-xs-2" ng-if="dataLoading">
+            <div class="col-xs-offset-3">
+                <md-progress-circular class="md-hue-2" md-mode="indeterminate"></md-progress-circular>
+            </div>
+        </div>
+        <md-content layout="column" flex class="md-padding" ng-if="!dataLoading">
+            <div class="col-lg-4 col-sm-4" ng-repeat="job in jobChartData">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <i class="fa fa-bar-chart-o fa-fw"></i> <h4>{{job.name}}</h4>
+                        <canvas id="{{job.name}}" class="chart chart-pie" data="job.pieData"
+                                labels="job.labels" legend="true"></canvas>
+                    </div>
+                </div>
+            </div>
+        </md-content>
+    </div>
+</div>
+<!--#formatter:off-->
+<!-- Angular Material Dependencies -->
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.10/js/jquery.dataTables.min.js"></script>
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-animate.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-aria.min.js"></script>
+
+<script src="http://ajax.googleapis.com/ajax/libs/angular_material/1.0.0/angular-material.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-material-icons/0.7.0/angular-material-icons.min.js"></script>
+
+<script src="@routes.Assets.versioned("javascripts/lib/Chart.min.js")" type="text/javascript"></script>
+<script src="@routes.Assets.versioned("javascripts/lib/angular-chart.min.js")" type="text/javascript"></script>
+<script src="@routes.Assets.versioned("javascripts/lib/angular-datatables.min.js")" type="text/javascript"></script>
+<!--<script src="js/Chart.min.js"></script>-->
+<!--<script src="js/angular-chart.min.js"></script>-->
+
+<script src="@routes.Assets.versioned("javascripts/jenkins.js")" type="text/javascript"></script>
+<!--<script src="js/load.js"></script>-->
+<!--#formatter:on-->
+</body>
+</html>
