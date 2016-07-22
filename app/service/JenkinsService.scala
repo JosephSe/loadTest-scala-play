@@ -38,6 +38,7 @@ class JenkinsServiceImpl @Inject()(ws: WSClient, conf: play.api.Configuration, c
   val jobURL = conf.getString("jenkins.url").get + "/job/"
   val sitJobs: List[String] = conf.getStringList("jenkins.sitJobs").get.toList
   val prodJobs: List[String] = conf.getStringList("jenkins.prodJobs").get.toList
+  var count = 0
 
   override def getLatestDetails(name: String): Future[JenkinsJob] = {
     val res = ws.url(jobURL + s"$name/api/json").get().map { response =>
@@ -58,52 +59,64 @@ class JenkinsServiceImpl @Inject()(ws: WSClient, conf: play.api.Configuration, c
 
     futureResponse map { value =>
       value._2.isRunning = value._1
-      cache.set(s"jenkins.$name-$jobNumber", value._2)
+      cache.set(s"$name.$jobNumber", value._2)
+      //      cache.set(s"jenkins.$name-$jobNumber", value._2)
       value._2
     }
     //    }
   }
 
   private def getJob(name: String, jobNumber: String): Future[JenkinsJob] = {
-    cache.getOrElse(s"jenkins.$name-$jobNumber") {
-      ws.url(s"$jobURL$name/$jobNumber/api/json").get().map { rawResponse =>
-        val response = rawResponse.json
-        val url = (response \ "url" get).as[JsString].value
-        val time = (response \ "timestamp" get).as[JsNumber].value.toLong
-        val actions = (response \ "actions").get
-        val fail = (actions \\ "failCount")
-        val failCount = (actions \\ "failCount") match {
-          case seq: Seq[JsValue] => if (seq.size == 0) 0
-          else seq.get(0).toString().toInt
-          case _ => 0
-        }
-        val skipCount = (actions \\ "skipCount") match {
-          case seq: Seq[JsValue] => if (seq.size == 0) 0
-          else seq.get(0).toString().toInt
-          case _ => 0
-        }
-        val totalCount = (actions \\ "totalCount") match {
-          case seq: Seq[JsValue] => if (seq.size == 0) 0
-          else seq.get(0).toString().toInt
-          case _ => 0
-        }
-        val result = (response \ "result") match {
-          case value: JsValue => value.toString()
-          case defined: JsDefined => var resultResponse = "null"
-            try {
-              resultResponse = defined.get.asInstanceOf[JsString].value
-            } catch {
-              case _ => println(s"Fail !!!! $defined")
-            }
-            resultResponse
-          case seq: JsString => seq.value
-          case _ => "unknown"
-        }
-        //        val result = (response \ "result").asInstanceOf[JsDefined].value.asInstanceOf[JsString].value
-        val job = JenkinsJob(name, jobNumber.toInt, failCount, skipCount, totalCount, url, time, result)
-        cache.set(s"jenkins.$name-$jobNumber", job)
-        job
+    val job = cache.get[JenkinsJob](s"jenkins.$name-$jobNumber")
+    if (false) Future {
+      //    if (job.isDefined) Future {
+      job.get
+    }
+    else ws.url(s"$jobURL$name/$jobNumber/api/json").get().map { rawResponse =>
+      val response = rawResponse.json
+      val url = (response \ "url" get).as[JsString].value
+      val time = (response \ "timestamp" get).as[JsNumber].value.toLong
+      val actions = (response \ "actions").get
+      val fail = (actions \\ "failCount")
+      val failCount = (actions \\ "failCount") match {
+        case seq: Seq[JsValue] => if (seq.size == 0) 0
+        else seq.get(0).toString().toInt
+        case _ => 0
       }
+      val skipCount = (actions \\ "skipCount") match {
+        case seq: Seq[JsValue] => if (seq.size == 0) 0
+        else seq.get(0).toString().toInt
+        case _ => 0
+      }
+      val totalCount = (actions \\ "totalCount") match {
+        case seq: Seq[JsValue] => if (seq.size == 0) 0
+        else seq.get(0).toString().toInt
+        case _ => 0
+      }
+      val building = (response \ "building") match {
+        case seq: JsBoolean => seq.value
+        case seq: JsDefined => seq.value.asInstanceOf[JsBoolean].value
+        case _ => false
+      }
+      val result = (response \ "result") match {
+        case value: JsValue => value.toString()
+        case JsDefined(null) => println("nulll !!!!")
+          "FAILURE"
+        case defined: JsDefined => var resultResponse = "FAILURE"
+          try {
+            resultResponse = defined.get.asInstanceOf[JsString].value
+          } catch {
+            case _ =>
+              if (building) resultResponse = "BUILDING"
+          }
+          resultResponse
+        case seq: JsString => seq.value
+        case _ => "unknown"
+      }
+      val job = JenkinsJob(name, jobNumber.toInt, failCount, skipCount, totalCount, url, time, result, building)
+      //      cache.set(s"$name.$jobNumber", job)
+      if (!building) cache.set(s"jenkins.$name-$jobNumber", job)
+      job
     }
   }
 
@@ -115,24 +128,24 @@ class JenkinsServiceImpl @Inject()(ws: WSClient, conf: play.api.Configuration, c
   }
 
   override def isCurrentlyBuilding(name: String): Future[Boolean] = {
-    ws.url(s"$jobURL$name/lastBuild/api/json").get().map { rawResponse =>
-      new Boolean((rawResponse.json \ "building").asInstanceOf[JsDefined].value.toString())
+    ws.url(s"$jobURL$name/lastBuild/api/json").get().map {
+      rawResponse =>
+        new Boolean((rawResponse.json \ "building").asInstanceOf[JsDefined].value.toString())
     }
   }
 
   override def loadJobHistory(name: String): Future[List[JenkinsJob]] = {
-    ws.url(jobURL + s"$name/api/json").get().map { response =>
-      Future.sequence {
-        (response.json \ "builds").asInstanceOf[JsDefined].value.asInstanceOf[JsArray].value.toList.map { build =>
-          getJob(name, (build \ "number").asInstanceOf[JsDefined].value.toString())
+    ws.url(jobURL + s"$name/api/json").get().map {
+      response =>
+        Future.sequence {
+          (response.json \ "builds").asInstanceOf[JsDefined].value.asInstanceOf[JsArray].value.toList.map {
+            build =>
+              getJob(name, (build \ "number").asInstanceOf[JsDefined].value.toString())
+          }
         }
-        //      } flatMap { m =>
-        //                Future {m.foldLeft(List[JenkinsJob]())((lst, job) => lst :: List[JenkinsJob](job))}
-        //          m.sortWith((lt, rt) => lt.buildNo < rt.buildNo)
-        //        }
-      }
-    } flatMap { job =>
-      job
+    } flatMap {
+      job =>
+        job
     }
   }
 
@@ -144,9 +157,10 @@ class JenkinsServiceImpl @Inject()(ws: WSClient, conf: play.api.Configuration, c
     }
     Future.sequence {
       jobs.map(loadJobHistory(_))
-    } map { jobLst =>
-      val jobMap = jobLst.flatten.foldLeft(Map[String, List[JenkinsJob]]())((r, c) => r + (c.name -> (r.getOrDefault(c.name, List[JenkinsJob]()) ::: List[JenkinsJob](c))))
-      jobMap.foldLeft(Map[String, List[JenkinsJob]]())((r, c) => r ++ Map(c._1 -> c._2.sortWith((lt, rt) => lt.buildNo < rt.buildNo)))
+    } map {
+      jobLst =>
+        val jobMap = jobLst.flatten.foldLeft(Map[String, List[JenkinsJob]]())((r, c) => r + (c.name -> (r.getOrDefault(c.name, List[JenkinsJob]()) ::: List[JenkinsJob](c))))
+        jobMap.foldLeft(Map[String, List[JenkinsJob]]())((r, c) => r ++ Map(c._1 -> c._2.sortWith((lt, rt) => lt.buildNo < rt.buildNo)))
 
     }
   }

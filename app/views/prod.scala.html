@@ -43,21 +43,21 @@
 </md-toolbar>
         <md-content layout-xs="column" layout="row" flex>
                 <!--<div layout="row" flex layout-xs="column" flex id="content" layout="row" layout-padding layout-margin layout-fill layout-wrap>-->
-                <div layout="row" flex ng-init="initChart()" layout-xs="column" flex id="content" layout="row" layout-padding layout-margin layout-fill layout-wrap>
+                <div layout="row" flex ng-init="initChart()" layout-xs="column" flex id="content" layout="row" layout-padding layout-margin layout-fill layout-wrap  layout-align="center center">
                     <div class="col-xs-offset-5 col-xs-2" ng-if="dataLoading">
                         <div class="col-xs-offset-3">
                             <md-progress-circular class="md-hue-2" md-mode="indeterminate"></md-progress-circular>
                         </div>
                     </div>
-                    <div layout-wrap layout-align="center center">
-                    <!--<div ng-if="!dataLoading" layout-wrap layout-align="center center">-->
-<!--
+                    <div layout-wrap layout-align="center center"  ng-if="!dataLoading">
                         <md-card md-theme-watch class="md-whiteframe-2dp">
-                            <div id='chart_div' style='width: 900px; height: 500px;'></div>
-                        </md-card>
--->
-                        <md-card md-theme-watch class="md-whiteframe-2dp">
-                            <div id='coreChart_div' style='width: 900px; height: 500px;'></div>
+                            <div id='coreChart_div' style='width: 800px; height: 500px;'></div>
+                            <md-card-actions layout="column" layout-align="start">
+                                    <div class="bottom-block">
+                                        <span>Production test status</span>
+                                    </div>
+                            </md-card-actions>
+
                         </md-card>
                     </div>
             <!--Alert-->
