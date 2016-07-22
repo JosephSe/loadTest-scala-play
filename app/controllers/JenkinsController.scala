@@ -28,7 +28,6 @@ class JenkinsController @Inject()(jenkinsService: JenkinsService, cached: Cached
   }
 
   def jobDetails(name: String) = Action.async {
-    //      Future {Json.toJson(jenkinsService.getLatestDetails(name))}
     jenkinsService.getLatestDetails(name).map { job =>
       Ok(Json.toJson(job))
     }
@@ -39,4 +38,16 @@ class JenkinsController @Inject()(jenkinsService: JenkinsService, cached: Cached
       Ok(Json.toJson(job))
     }
   }
+
+  def jobHistory(name:String) = Action.async {
+    jenkinsService.loadJobHistory(name).map { jobs =>
+      Ok(Json.toJson(jobs))
+    }
+  }
+  def allJobHistory(group:String) = Action.async {
+    jenkinsService.allJobHistory(group).map { job =>
+      Ok(Json.toJson(job))
+    }
+  }
+
 }

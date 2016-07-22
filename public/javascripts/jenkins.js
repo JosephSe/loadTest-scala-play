@@ -30,6 +30,7 @@ app.controller('AppCtrl', ['$rootScope', '$scope', '$mdSidenav', '$http', '$log'
         var labels = ["passed", "skipped", "failed"];
           angular.forEach(response, function(value) {
               value.labels = labels;
+//              value.running = true;
               value.pieData=[];
               value.pieData.push(value.totalCount-value.failCount-value.skipCount);
               value.pieData.push(value.skipCount);

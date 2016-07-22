@@ -1,4 +1,4 @@
-package controller
+package controllers
 
 import controllers.ResponseController
 import org.scalamock.scalatest.MockFactory

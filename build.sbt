@@ -21,6 +21,7 @@ libraryDependencies ++= Seq(
   "org.webjars" % "angular-material" % "1.0.5",
   //SocksJS
   "org.scalamock" %% "scalamock-scalatest-support" % "3.2" % "test",
+  "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.0" % "test",
   //  Conflict resolution
   "org.apache.httpcomponents" % "httpclient" % "4.3.4" exclude("commons-logging", "commons-logging"),
   "com.google.guava" % "guava" % "18.0",
