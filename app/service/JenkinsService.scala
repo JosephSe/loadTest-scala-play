@@ -126,13 +126,13 @@ class JenkinsServiceImpl @Inject()(ws: WSClient, conf: play.api.Configuration, c
         (response.json \ "builds").asInstanceOf[JsDefined].value.asInstanceOf[JsArray].value.toList.map { build =>
           getJob(name, (build \ "number").asInstanceOf[JsDefined].value.toString())
         }
-      } flatMap { m =>
-        //        Future {m.foldLeft(List[JenkinsJob]())((lst, job) => lst :: List[JenkinsJob](job))}
-//          m.sortWith((lt, rt) => lt.buildNo < rt.buildNo)
-        }
+        //      } flatMap { m =>
+        //                Future {m.foldLeft(List[JenkinsJob]())((lst, job) => lst :: List[JenkinsJob](job))}
+        //          m.sortWith((lt, rt) => lt.buildNo < rt.buildNo)
+        //        }
       }
-      //    } flatMap { job =>
-      //      job
+    } flatMap { job =>
+      job
     }
   }
 
