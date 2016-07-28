@@ -49,5 +49,12 @@ class JenkinsController @Inject()(jenkinsService: JenkinsService, cached: Cached
       Ok(Json.toJson(job))
     }
   }
+  def jobHistoryStatusCount(group:String, clearText:String) = Action.async {
+    import util.Utils.StringUtils
+    jenkinsService.jobHistoryStatusCount(group).map { job =>
+      val j = job.map(jobDetail => (jobDetail._1.removeText(clearText.split(",")), jobDetail._2))
+      Ok(Json.toJson(j))
+    }
+  }
 
 }

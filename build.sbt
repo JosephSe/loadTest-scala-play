@@ -1,6 +1,6 @@
 name := """async-server-scala"""
 
-version := "2.0.1-SNAPSHOT"
+version := "2.0.2-SNAPSHOT"
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala).enablePlugins(SbtWeb)
 
@@ -51,6 +51,8 @@ WebKeys.packagePrefix in Assets := "public/"
 ivyScala := ivyScala.value map {
   _.copy(overrideScalaVersion = true)
 }
+
+javaOptions in Test += "-Dconfig.file=conf/application.test.conf"
 
 javaOptions in run += "-Xmx4G"
 

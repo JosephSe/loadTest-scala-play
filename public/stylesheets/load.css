@@ -1,3 +1,17 @@
 td {
 	font-size: small;
 }
+
+.gauge {
+    margin:10px 5px 0 0;
+    padding:6px 16px;
+    overflow: inherit;
+}
+/*
+.gauge .gauge-text {
+    y:100;
+}*/
+
+#gagueChart_div table {
+    margin:auto;
+}

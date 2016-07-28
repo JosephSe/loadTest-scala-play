@@ -38,7 +38,7 @@ object XmlFile {
 
     override def clear(entity: XmlFile): XmlFile = entity.copy(uuid = None)
   }
-
+  def empty = XmlFile(None, "", None, None)
 }
 
 case class ZipFile(uuid: Option[UUID], var name: String, content: Option[Array[Byte]], time: Option[Date] = Some(new Date)) extends MongoEntity {
@@ -70,5 +70,6 @@ object ZipFile {
       ZipFile(None, name, null, null)
     }
   }
+  def empty = ZipFile(None, "", None, None)
 
 }

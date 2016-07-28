@@ -8,13 +8,13 @@ app.controller('AppCtrl', ['$rootScope', '$scope', '$http', '$log', '$mdMedia', 
             $scope.charts = ['Pie'];
             $scope.jobChartData = [];
             $scope.serverResponse = {};
+            $scope.gaugeData = {};
 
             //new
             google.charts.load('current', {
-                'packages': ['annotationchart', 'line']
+                'packages': ['annotationchart', 'line', 'gauge']
             });
-            //      google.charts.load('current', {'packages':['annotationchart', 'corechart', 'line']});
-            google.charts.setOnLoadCallback(drawLogScales);
+//            google.charts.setOnLoadCallback(drawLogScales);
 
             $scope.initChart = function() {
                 $scope.dataLoading = true;
@@ -22,10 +22,20 @@ app.controller('AppCtrl', ['$rootScope', '$scope', '$http', '$log', '$mdMedia', 
                     method: 'GET',
                     url: '/jenkins/job/history/all'
                 }).then(function successCallback(response) {
-                    $scope.dataLoading = false;
                     $scope.serverResponse = response.data;
-                    google.charts.setOnLoadCallback(drawLogScales);
+                    getCount();
                     //                drawLogScales(response.data);
+                }, function errorCallback(response) {});
+            }
+
+            function getCount() {
+                $http({
+                    method:'GET',
+                    url:'/jenkins/job/history/count'
+                }).then(function successCallback(response) {
+                    $scope.gaugeData = response.data;
+                    $scope.dataLoading = false;
+                    google.charts.setOnLoadCallback(drawLogScales);
                 }, function errorCallback(response) {});
             }
 
@@ -43,6 +53,7 @@ app.controller('AppCtrl', ['$rootScope', '$scope', '$http', '$log', '$mdMedia', 
             }
 
             function drawLogScales() {
+                drawGauge();
                 var response = $scope.serverResponse;
                 //                      var tmp = new google.visualization.DataTable();
                 var data = new google.visualization.DataTable();
@@ -98,6 +109,30 @@ app.controller('AppCtrl', ['$rootScope', '$scope', '$http', '$log', '$mdMedia', 
                 var chart = new google.visualization.LineChart(document.getElementById('coreChart_div'));
                 chart.draw(data, options);
             }
+
+            function drawGauge() {
+                var gData = $scope.gaugeData;
+                var dataArray = [];
+                dataArray.push(['Label', 'Value']);
+                angular.forEach(gData, function(value, key) {
+                    dataArray.push([key, value]);
+                });
+                var data = google.visualization.arrayToDataTable(dataArray);
+                var options = {
+                  width: 800, height: 200,
+                  greenFrom: 90, greenTo: 100,
+                  yellowFrom:60, yellowTo: 90,
+                  redFrom:0, redTo: 60,
+                  minorTicks: 10
+                };
+
+                var chart = new google.visualization.Gauge(document.getElementById('gagueChart_div'));
+                chart.draw(data, options);
+//                $('#gagueChart_div svg text').attr('y', 100);
+                $('#gagueChart_div td').addClass('gauge');
+//                $('#gagueChart_div svg').find('text:first').addClass('gauge-text');
+            }
+
 
             function getStatusCode(job) {
                 var status = job.result

@@ -25,6 +25,7 @@ GET     /messages                   controllers.JenkinsController.messages
 GET     /jenkins/job/all                   controllers.JenkinsController.allJobDetails
 GET     /jenkins/job/:name                   controllers.JenkinsController.jobDetails(name:String)
 GET     /jenkins/job/history/all                   controllers.JenkinsController.allJobHistory(env:String ?= "prod")
+GET     /jenkins/job/history/count                   controllers.JenkinsController.jobHistoryStatusCount(env:String ?= "prod", clearText:String ?= "HTMLFO_,_Prod")
 GET     /jenkins/job/history/:name                   controllers.JenkinsController.jobHistory(name:String)
 
 # Map static resources from the /public folder to the /assets URL path

@@ -33,6 +33,10 @@ object Utils {
     def removeDelimiter: String = {
       str.substring(0, str.lastIndexOf("."))
     }
+
+    def removeText(strArray:Array[String]) = {
+      strArray.foldLeft(str)((r, c) => r.replace(c, ""))
+    }
   }
 
 }

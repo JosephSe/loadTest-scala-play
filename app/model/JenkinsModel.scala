@@ -13,4 +13,5 @@ case class JenkinsJob(name:String, buildNo:Int, failCount:Int, skipCount:Int, to
 
 object JenkinsJob {
   implicit val jenkinsJob = Json.format[JenkinsJob]
+  def empty = JenkinsJob("", 0, 0, 0,0, "",0L, "")
 }
