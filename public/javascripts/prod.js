@@ -1,23 +1,26 @@
 var app = angular.module('StarterApp', ['ngMaterial', 'ngMessages', 'ngMdIcons']);
 
-app.controller('AppCtrl', ['$rootScope', '$scope', '$http', '$log', '$mdMedia', '$mdUtil',
-        function($rootScope, $scope, $http, $log, $mdMedia, $mdUtil) {
+app.controller('AppCtrl', ['$rootScope', '$scope', '$http', '$log', '$mdMedia', '$mdUtil', '$interval',
+        function($rootScope, $scope, $http, $log, $mdMedia, $mdUtil, $interval) {
             var hostName = window.location.host;
             $scope.searchEnabled = false;
             $scope.dataLoading = true;
+            $scope.screenRefreshTimeout = 60000;
             $scope.charts = ['Pie'];
             $scope.jobChartData = [];
             $scope.serverResponse = {};
             $scope.gaugeData = {};
-
+            $scope.windowWidth = $(window).width();
+            var chartLoaded = false;
             //new
             google.charts.load('current', {
                 'packages': ['annotationchart', 'line', 'gauge']
             });
-//            google.charts.setOnLoadCallback(drawLogScales);
+            //            google.charts.setOnLoadCallback(drawLogScales);
 
             $scope.initChart = function() {
-                $scope.dataLoading = true;
+                if(!chartLoaded)
+                    $scope.dataLoading = true;
                 $http({
                     method: 'GET',
                     url: '/jenkins/job/history/all'
@@ -30,12 +33,17 @@ app.controller('AppCtrl', ['$rootScope', '$scope', '$http', '$log', '$mdMedia', 
 
             function getCount() {
                 $http({
-                    method:'GET',
-                    url:'/jenkins/job/history/count'
+                    method: 'GET',
+                    url: '/jenkins/job/history/count'
                 }).then(function successCallback(response) {
                     $scope.gaugeData = response.data;
                     $scope.dataLoading = false;
-                    google.charts.setOnLoadCallback(drawLogScales);
+                    if(!chartLoaded) {
+                        google.charts.setOnLoadCallback(drawLogScales);
+                        chartLoaded = true;
+                    } else {
+                        drawLogScales();
+                    }
                 }, function errorCallback(response) {});
             }
 
@@ -53,7 +61,6 @@ app.controller('AppCtrl', ['$rootScope', '$scope', '$http', '$log', '$mdMedia', 
             }
 
             function drawLogScales() {
-                drawGauge();
                 var response = $scope.serverResponse;
                 //                      var tmp = new google.visualization.DataTable();
                 var data = new google.visualization.DataTable();
@@ -75,14 +82,15 @@ app.controller('AppCtrl', ['$rootScope', '$scope', '$http', '$log', '$mdMedia', 
                 }
 
                 var options = {
-                    chart: {
-                        title: 'Production system status'
-                    },
+                    width: $scope.windowWidth,
+                    // chart: {
+                    //     title: 'Production system status'
+                    // },
                     hAxis: {
-                        title: 'System Status',
+                        // title: 'System Status',
                         baselineColor: '#fff',
-                        gridlineColor: '#fff',
-                        logScale: false
+                        gridlineColor: '#fff'
+                            // logScale: false
                     },
                     vAxis: {
                         baselineColor: '#fff',
@@ -90,57 +98,83 @@ app.controller('AppCtrl', ['$rootScope', '$scope', '$http', '$log', '$mdMedia', 
                         textPosition: 'none'
                     },
                     colors: ['#097138', '#46BFBD', '#FDB45C', '#949FB1', '#4D5360', '#97BBCD'],
-//                    smoothLine: true,
-                    animation:{
+                    //                    smoothLine: true,
+                    animation: {
                         duration: 1000,
                         easing: 'inAndOut',
-//                        easing: 'out',
                         startup: true
-                     },
+                    },
                     chartArea: {
                         left: 20,
                         top: 15,
-                        width: '65%',
-                        height: '75%'
+                        width: '75%',
+                        height: '85%'
                     }
-                    //                        legend: { position: 'bottom' }
                 };
 
                 var chart = new google.visualization.LineChart(document.getElementById('coreChart_div'));
                 chart.draw(data, options);
+                drawGauge();
             }
 
             function drawGauge() {
                 var gData = $scope.gaugeData;
                 var dataArray = [];
+                var emptyArray = [];
                 dataArray.push(['Label', 'Value']);
+                emptyArray.push(['Label', 'Value']);
                 angular.forEach(gData, function(value, key) {
                     dataArray.push([key, value]);
+                    emptyArray.push([key, 0]);
                 });
-                var data = google.visualization.arrayToDataTable(dataArray);
                 var options = {
-                  width: 800, height: 200,
-                  greenFrom: 90, greenTo: 100,
-                  yellowFrom:60, yellowTo: 90,
-                  redFrom:0, redTo: 60,
-                  minorTicks: 10
+                    width: $scope.windowWidth,
+                    height: 190,
+                    //                  width: 800, height: 200,
+                    greenFrom: 90,
+                    greenTo: 100,
+                    yellowFrom: 60,
+                    yellowTo: 90,
+                    redFrom: 0,
+                    redTo: 60,
+                    minorTicks: 10,
+                    chartArea: {
+                        width: '75%',
+                        height: '85%'
+                    },
+                    animation: {
+                        duration: 3000,
+                        easing: 'inAndOut',
+                        startup: true
+                    },
+
                 };
 
                 var chart = new google.visualization.Gauge(document.getElementById('gagueChart_div'));
-                chart.draw(data, options);
-//                $('#gagueChart_div svg text').attr('y', 100);
-                $('#gagueChart_div td').addClass('gauge');
-//                $('#gagueChart_div svg').find('text:first').addClass('gauge-text');
-            }
+                var emptyData = google.visualization.arrayToDataTable(emptyArray);
+                chart.draw(emptyData, options);
 
+                var chartData = google.visualization.arrayToDataTable(dataArray);
+                setTimeout(chart.draw(chartData, options), 3000);
+
+                //                $('#gagueChart_div svg text').attr('y', 100);
+                $('#gagueChart_div td').addClass('gauge');
+                $('#gagueChart_div svg').find('text:first').attr('y', 200);
+                $('#gagueChart_div svg').find('text:first').addClass('gauge-text');
+            }
 
             function getStatusCode(job) {
                 var status = job.result
                 if (status === "SUCCESS" || status === "BUILDING") return 1
-                else if (status === "ABORTED") return -1
-                else if (status === "FAILURE") return 0
+                else if (status === "ABORTED") return 0
+                else if (status === "FAILURE") return -.5
             }
 
+//            setInterval($scope.initChart(), 5000);
+            // $interval($scope.initChart(), 500);
+            $interval(function() {
+                $scope.initChart();
+            }, $scope.screenRefreshTimeout);
         }
     ])
     .config(function($mdThemingProvider) {

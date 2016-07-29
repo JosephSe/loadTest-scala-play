@@ -7,11 +7,13 @@ td {
     padding:6px 16px;
     overflow: inherit;
 }
-/*
-.gauge .gauge-text {
+.gauge svg {
+	height: 210;
+}
+/*.gauge .gauge-text {
     y:100;
-}*/
-
+}
+*/
 #gagueChart_div table {
     margin:auto;
 }

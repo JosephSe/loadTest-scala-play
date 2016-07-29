@@ -8,6 +8,7 @@
     <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/material.css")'>
     <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/load.css")'>
     <meta name="viewport" content="initial-scale=1"/>
+    <!-- <meta http-equiv="refresh" content="60"/> -->
     <!--#formatter:on-->
 </head>
 <body layout="column" ng-controller="AppCtrl">
@@ -41,8 +42,8 @@
     </div>
 </md-toolbar>
         <md-content layout-xs="column" layout="row" flex>
-            <!--<div layout="row" flex layout-xs="column" flex id="content" layout="row" layout-padding layout-margin layout-fill layout-wrap>-->
-            <div layout="row" flex ng-init="initChart()" layout-xs="column" flex id="content" layout="row" layout-padding layout-margin layout-fill layout-wrap>
+            <div layout="row" flex ng-init="initChart()" layout-xs="column" flex id="content" layout="row" layout-align="center" style='width: 100%;'>
+            <!--<div layout="row" flex ng-init="initChart()" layout-xs="column" flex id="content" layout="row" layout-padding layout-margin layout-fill layout-wrap>-->
                 <div class="col-xs-offset-5 col-xs-2" ng-if="dataLoading">
                     <div class="col-xs-offset-3">
                         <md-progress-circular class="md-hue-2" md-mode="indeterminate"></md-progress-circular>
@@ -50,7 +51,8 @@
                 </div>
                 <div layout-wrap layout-align="center center"  ng-if="!dataLoading" >
                     <md-card md-theme-watch class="md-whiteframe-2dp" layout-align="center center">
-                        <div id='coreChart_div' style='width: 800px; height: 500px;'></div>
+                        <!--<div id='coreChart_div'></div>-->
+                        <div id='coreChart_div' style='width: 100%; height: 400px;'></div>
                         <md-card-actions layout="column" layout-align="start">
                                 <div class="bottom-block">
                                     <span>Production test status</span>
@@ -59,7 +61,7 @@
 
                     </md-card>
                     <md-card md-theme-watch class="md-whiteframe-2dp" layout-align="center center">
-                        <div id='gagueChart_div' style='width: 800px; height: 125px;'></div>
+                        <div id='gagueChart_div' style='width: 100%; height: 250px;'></div>
                         <md-card-actions layout="column" layout-align="start">
                                 <div class="bottom-block">
                                     <span>Success in past 100 runs</span>
