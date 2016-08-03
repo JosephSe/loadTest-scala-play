@@ -11,12 +11,12 @@ app.controller('AppCtrl', ['$rootScope', '$scope', '$http', '$log', '$mdMedia', 
             $scope.serverResponse = {};
             $scope.gaugeData = {};
             $scope.windowWidth = $(window).width();
+
+            var brokenBuildStyle = 'point { size: 10; shape-type: star; fill-color: #a52714; opacity: 1;shape-sides: 7; shape-dent: 0.3;}';
             var chartLoaded = false;
-            //new
             google.charts.load('current', {
-                'packages': ['annotationchart', 'line', 'gauge']
+                'packages': ['annotationchart', 'gauge']
             });
-            //            google.charts.setOnLoadCallback(drawLogScales);
 
             $scope.initChart = function() {
                 if(!chartLoaded)
@@ -69,28 +69,26 @@ app.controller('AppCtrl', ['$rootScope', '$scope', '$http', '$log', '$mdMedia', 
                 var keysArray = [];
                 angular.forEach(response, function(value, key) {
                     data.addColumn('number', key);
+                    data.addColumn({type:'string', role:'tooltip'});
+                    data.addColumn({type: 'string', role: 'style', p: {html:true}});
                     keysArray.push(key);
                 });
                 var size = response.size;
-                data.addRows(100);
-
                 for (i = 0; i < 100; i++) {
-                    data.setCell(i, 0, i)
+                    var dataArr = []
+                    dataArr.push(i);
                     for (j = 0; j < keysArray.length; j++) {
-                        data.setCell(i, j + 1, (j / 2) + getStatusCode(response[keysArray[j]][i]))
+                        dataArr.push(getStatusCode(j, response[keysArray[j]][i]));
+                        dataArr.push(getAnnotation(keysArray[j], response[keysArray[j]][i]));
+                        dataArr.push(getStyle(response[keysArray[j]][i]));
                     }
+                    data.addRow(dataArr);
                 }
-
                 var options = {
                     width: $scope.windowWidth,
-                    // chart: {
-                    //     title: 'Production system status'
-                    // },
                     hAxis: {
-                        // title: 'System Status',
                         baselineColor: '#fff',
                         gridlineColor: '#fff'
-                            // logScale: false
                     },
                     vAxis: {
                         baselineColor: '#fff',
@@ -98,7 +96,7 @@ app.controller('AppCtrl', ['$rootScope', '$scope', '$http', '$log', '$mdMedia', 
                         textPosition: 'none'
                     },
                     colors: ['#097138', '#46BFBD', '#FDB45C', '#949FB1', '#4D5360', '#97BBCD'],
-                    //                    smoothLine: true,
+                    smoothLine: true,
                     animation: {
                         duration: 1000,
                         easing: 'inAndOut',
@@ -109,7 +107,9 @@ app.controller('AppCtrl', ['$rootScope', '$scope', '$http', '$log', '$mdMedia', 
                         top: 15,
                         width: '75%',
                         height: '85%'
-                    }
+                    },
+//                    tooltip: {isHtml: true}
+                  dataOpacity: 0.3
                 };
 
                 var chart = new google.visualization.LineChart(document.getElementById('coreChart_div'));
@@ -163,15 +163,23 @@ app.controller('AppCtrl', ['$rootScope', '$scope', '$http', '$log', '$mdMedia', 
                 $('#gagueChart_div svg').find('text:first').addClass('gauge-text');
             }
 
-            function getStatusCode(job) {
+            function getStatusCode(pos, job) {
                 var status = job.result
-                if (status === "SUCCESS" || status === "BUILDING") return 1
-                else if (status === "ABORTED") return 0
-                else if (status === "FAILURE") return -.5
+                if (status === "SUCCESS" || status === "BUILDING") return pos + 1
+                else return pos + .7
+            }
+            function getAnnotation(name, job) {
+                return name +":Build #"+job.buildNo
+//                var status = job.result
+//                if (status === "FAILURE") return name +":Build #"+job.buildNo
+//                else return null
+            }
+            function getStyle(job) {
+                var status = job.result
+                if (status === "FAILURE") return brokenBuildStyle
+                else return null
             }
 
-//            setInterval($scope.initChart(), 5000);
-            // $interval($scope.initChart(), 500);
             $interval(function() {
                 $scope.initChart();
             }, $scope.screenRefreshTimeout);

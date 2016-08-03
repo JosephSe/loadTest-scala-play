@@ -72,3 +72,6 @@ curl -XPOST --show-error http://longscm01n:9090/job/Nova_Comparison_SIT/build
 http://longscm01n:9090/job/HTML_Pricing_SIT/129/testReport/api/json?pretty=true
 
 layout-padding layout-margin layout-fill layout-wrap
+
+
+https://jsfiddle.net/Lgy6y0a0/14/

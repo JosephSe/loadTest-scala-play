@@ -13,6 +13,7 @@ import play.api.test.Helpers._
  */
 @RunWith(classOf[JUnitRunner])
 class ApplicationSpec extends Specification {
+/*
   "Application" should {
 
     "send 404 on a bad request" in new WithApplication{
@@ -35,7 +36,7 @@ class ApplicationSpec extends Specification {
 
     "return Not found status for unknown search request /xml/get zip" in new WithApplication() {
       val respoonse = route(FakeRequest(GET, "/xml/get/test1232.zip")).get
-
+s
       status(respoonse) must equalTo(NOT_FOUND)
     }
     "return 200 status & respons for valid search request /xml/get xml" in new WithApplication() {
@@ -44,4 +45,5 @@ class ApplicationSpec extends Specification {
 //      contentType(respoonse) must beSome.which(_ == "application/json")
     }
   }
+*/
 }
