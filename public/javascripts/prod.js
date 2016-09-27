@@ -1,50 +1,60 @@
 var app = angular.module('StarterApp', ['ngMaterial', 'ngMessages', 'ngMdIcons']);
 
-app.controller('AppCtrl', ['$rootScope', '$scope', '$http', '$log', '$mdMedia', '$mdUtil', '$interval',
-        function($rootScope, $scope, $http, $log, $mdMedia, $mdUtil, $interval) {
+app.controller('AppCtrl', ['$rootScope', '$scope', '$http', '$log', '$mdMedia', '$mdUtil', '$interval','$location',
+        function($rootScope, $scope, $http, $log, $mdMedia, $mdUtil, $interval, $location) {
             var hostName = window.location.host;
             $scope.searchEnabled = false;
+            $scope.summaryView = false;
+            var paramValue = $location.path();
+//            $scope.prodJobs = ["DIHotel"];
+            $scope.prodJobs = ["DIHotel", "Activity", "Hotel_PNR", "Hotel", "Transfer", "XMLA_Search"];
             $scope.dataLoading = true;
             $scope.screenRefreshTimeout = 60000;
-            $scope.charts = ['Pie'];
+            $scope.chartData = [];
+            $scope.historyChart = [];
             $scope.jobChartData = [];
-            $scope.serverResponse = {};
-            $scope.gaugeData = {};
             $scope.windowWidth = $(window).width();
 
             var brokenBuildStyle = 'point { size: 10; shape-type: star; fill-color: #a52714; opacity: 1;shape-sides: 7; shape-dent: 0.3;}';
             var chartLoaded = false;
-            google.charts.load('current', {
-                'packages': ['annotationchart', 'gauge']
-            });
 
+            google.charts.load('current', {'packages':['annotationchart', 'calendar', 'gauge']});
             $scope.initChart = function() {
-                if(!chartLoaded)
-                    $scope.dataLoading = true;
+                if($scope.summaryView) {
+                    getHistory();
+                    getCalendarData();
+                } else {
+                    getAllHistory();
+                    getCount(); // temp
+                }
+            }
+
+            function getAllHistory() {
+                getDataAndDraw('/jenkins/job/history/all', 'allHistory', drawLogScales);
+            }
+
+            function getDataAndDraw(serverURL, chartName, callbackMethod) {
                 $http({
                     method: 'GET',
-                    url: '/jenkins/job/history/all'
-                }).then(function successCallback(response) {
-                    $scope.serverResponse = response.data;
-                    getCount();
-                    //                drawLogScales(response.data);
-                }, function errorCallback(response) {});
+                        url: serverURL
+                    }).then(function successCallback(response) {
+                        $scope.chartData[chartName] = (response.data);
+                        google.charts.setOnLoadCallback(callbackMethod);
+
+                    }, function errorCallback(response) {}
+                );
             }
 
             function getCount() {
-                $http({
-                    method: 'GET',
-                    url: '/jenkins/job/history/count'
-                }).then(function successCallback(response) {
-                    $scope.gaugeData = response.data;
-                    $scope.dataLoading = false;
-                    if(!chartLoaded) {
-                        google.charts.setOnLoadCallback(drawLogScales);
-                        chartLoaded = true;
-                    } else {
-                        drawLogScales();
-                    }
-                }, function errorCallback(response) {});
+                getDataAndDraw('/jenkins/job/history/count', 'gaugeData', drawGauge);
+            }
+
+            function getHistory() {
+                getDataAndDraw('/jenkins/job/history/summary', 'summaryData', drawHistoryChart);
+            }
+
+            function getCalendarData() {
+                getDataAndDraw('/jenkins/job/history/summaryPerDay', 'calendarData', drawCalendarChart);
             }
 
             function loadData(response) {
@@ -61,8 +71,8 @@ app.controller('AppCtrl', ['$rootScope', '$scope', '$http', '$log', '$mdMedia', 
             }
 
             function drawLogScales() {
-                var response = $scope.serverResponse;
-                //                      var tmp = new google.visualization.DataTable();
+                var response =  $scope.chartData['allHistory']
+
                 var data = new google.visualization.DataTable();
                 var tempArray = [];
                 data.addColumn('number', 'Build number');
@@ -114,11 +124,109 @@ app.controller('AppCtrl', ['$rootScope', '$scope', '$http', '$log', '$mdMedia', 
 
                 var chart = new google.visualization.LineChart(document.getElementById('coreChart_div'));
                 chart.draw(data, options);
-                drawGauge();
+            }
+
+            function drawHistoryChart() {
+                var response = $scope.chartData['summaryData'];
+
+                var data = new google.visualization.DataTable();
+                data.addColumn('date', 'Date');
+                angular.forEach($scope.prodJobs, function(jobName) {
+                    data.addColumn('number', jobName);
+                    data.addColumn('string', jobName +' title');
+                    data.addColumn('string', jobName +' text');
+                });
+                var keysArray = [];
+                angular.forEach(response, function(value, key) {
+                    var dataArr = getHistoryRow(key, value);
+                    data.addRow(dataArr);
+                });
+
+                var options = {
+                    width: $scope.windowWidth - 10,
+                    hAxis: {
+                       maxValue:3,
+                       minValue:1
+                    },
+                    colors: ['#097138', '#46BFBD', '#FDB45C', '#949FB1', '#4D5360', '#97BBCD'],
+                    smoothLine: true,
+                    animation: {
+                        duration: 1000,
+                        easing: 'inAndOut',
+                        startup: true
+                    },
+                    chartArea: {
+                        left: 20,
+                        top: 15,
+                        width: '75%',
+                        height: '85%'
+                    },
+//                    tooltip: {isHtml: true}
+                  dataOpacity: 0.3,
+                  displayAnnotations: true
+                };
+
+                var chart = new google.visualization.AnnotationChart(document.getElementById('detailed_chart'));
+                chart.draw(data, options);
+            }
+
+            function drawCalendarChart() {
+                var response = $scope.chartData['calendarData'];
+
+                var data = new google.visualization.DataTable();
+                data.addColumn('date', 'Date');
+                data.addColumn('number', 'Failures');
+                var keysArray = [];
+                angular.forEach(response, function(value, key) {
+                    var dataArr = [];
+                    dataArr.push(new Date(key));
+                    dataArr.push(value * -1);
+                    data.addRow(dataArr);
+                });
+
+                var options = {
+                 title: "Prod Job failures",
+                 height: 350,
+                 chartArea: {
+                    left: 20,
+                    top: 15,
+                    width: '75%',
+                    height: '85%'
+                 },
+                 animation: {
+                    duration: 3000,
+                    easing: 'inAndOut',
+                    startup: true
+                 }
+                };
+
+                var chart = new google.visualization.Calendar(document.getElementById('calendarChart_div'));
+                chart.draw(data, options);
+
+                setTimeout(chart.draw(data, options), 3000);
+            }
+
+            function getHistoryRow(date, jobArr) {
+                var dataArr = [];
+                dataArr.push(new Date(date));
+                angular.forEach($scope.prodJobs, function(jobName) {
+                    var jobSumm = jobArr[jobName];
+                    if(jobSumm === undefined) {
+                        dataArr.push(0);
+                        dataArr.push(undefined);
+                        dataArr.push(undefined);
+                    } else {
+                        dataArr.push(jobSumm[0].failCount);
+                        dataArr.push(undefined);
+                        dataArr.push(undefined);
+                    }
+                });
+                return dataArr;
             }
 
             function drawGauge() {
-                var gData = $scope.gaugeData;
+//                var gData = $scope.gaugeData;
+                var gData = $scope.chartData['gaugeData'];
                 var dataArray = [];
                 var emptyArray = [];
                 dataArray.push(['Label', 'Value']);
@@ -146,8 +254,7 @@ app.controller('AppCtrl', ['$rootScope', '$scope', '$http', '$log', '$mdMedia', 
                         duration: 3000,
                         easing: 'inAndOut',
                         startup: true
-                    },
-
+                    }
                 };
 
                 var chart = new google.visualization.Gauge(document.getElementById('gagueChart_div'));

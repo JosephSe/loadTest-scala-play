@@ -1,15 +1,19 @@
 package service
 
 import com.typesafe.config.{Config, ConfigFactory}
+import dao.MongoCRUDService
 import model.JenkinsJob
 import org.junit.runner.RunWith
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.junit.JUnitRunner
-import org.scalatest.{BeforeAndAfter, FlatSpec, Matchers, ParallelTestExecution}
+import org.scalatest._
+import play.api.Play._
 import play.api.{Configuration, GlobalSettings, Play}
 import play.api.cache.CacheApi
 import play.api.test.FakeApplication
+import play.modules.reactivemongo.ReactiveMongoApi
+import reactivemongo.play.json.collection.JSONCollection
 import serviceBroker.JenkinsBroker
 
 import scala.concurrent.Future
@@ -21,12 +25,13 @@ class JenkinsServiceSpec extends FlatSpec with Matchers with MockFactory with Sc
 
   val cache = stub[CacheApi]
   val mockJenkinsBroker = stub[JenkinsBroker]
+  val mockMongoApi = mock[ReactiveMongoApi]
 
   class MockableConfig extends Configuration(mock[Config])
-
   val configStub = stub[MockableConfig]
   //    val conf = stub[play.api.Configuration]
-  val underTest = new JenkinsServiceImpl(configStub, cache, mockJenkinsBroker)
+  val underTest = new JenkinsServiceImpl(configStub, cache, mockJenkinsBroker, mockMongoApi)
+
   val emptyResponse = Future {
     JenkinsJob.empty
   }
@@ -61,5 +66,19 @@ class JenkinsServiceSpec extends FlatSpec with Matchers with MockFactory with Sc
     assert(job != null, "Response is null")
     (mockJenkinsBroker.getLatestDetails _) verify ("sit")
   }
+
+  "A allJobSummary call" should "return a list with JenkinsSummary in ascending order" ignore {
+    (configStub.getStringList _) when ("jenkins.sitJobs") returns (Some(List("sit").asJava))
+
+    val job = underTest.allJobSummary("prod", "jenJob")
+    assert(job != null, "Response is null")
+    whenReady(job) { result =>
+      result.size shouldEqual (2)
+      result.get("29/08/16").size shouldEqual (1)
+      result.get("30/08/16").size shouldEqual (1)
+    }
+  }
+
+
 
 }

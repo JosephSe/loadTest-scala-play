@@ -14,7 +14,7 @@ import scala.collection.JavaConversions._
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-
+import JenkinsJob.genId
 @ImplementedBy(classOf[JenkinsBrokerImpl])
 trait JenkinsBroker {
 
@@ -23,6 +23,8 @@ trait JenkinsBroker {
   def isCurrentlyBuilding(name: String): Future[Boolean]
 
   def loadJobHistory(name: String): Future[List[JenkinsJob]]
+
+  def getJob(name: String, jobNumber: String): Future[JenkinsJob]
 
 }
 
@@ -82,7 +84,7 @@ class JenkinsBrokerImpl @Inject()(ws: WSClient, conf: play.api.Configuration, ca
     }
   }
 
-  private def getJob(name: String, jobNumber: String): Future[JenkinsJob] = {
+  def getJob(name: String, jobNumber: String): Future[JenkinsJob] = {
     val job = cache.get[JenkinsJob](s"jenkins.$name-$jobNumber")
     //    if (false) Future {
     if (job.isDefined) Future {
@@ -129,7 +131,7 @@ class JenkinsBrokerImpl @Inject()(ws: WSClient, conf: play.api.Configuration, ca
         case seq: JsString => seq.value
         case _ => "unknown"
       }
-      val job = JenkinsJob(name, jobNumber.toInt, failCount, skipCount, totalCount, url, time, result, building)
+      val job = JenkinsJob(Some(genId(name, jobNumber.toInt)), name, jobNumber.toInt, failCount, skipCount, totalCount, url, time, result, building)
       if (!building) cache.set(s"jenkins.$name-$jobNumber", job)
       job
     }

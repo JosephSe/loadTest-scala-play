@@ -37,6 +37,10 @@ object Utils {
     def removeText(strArray:Array[String]) = {
       strArray.foldLeft(str)((r, c) => r.replace(c, ""))
     }
+    def removeTextCSV(str:String) = {
+      val strArray = str.split(",")
+      strArray.foldLeft(str)((r, c) => r.replace(c, ""))
+    }
   }
 
 }

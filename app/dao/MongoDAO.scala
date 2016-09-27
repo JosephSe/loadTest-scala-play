@@ -1,6 +1,6 @@
 package dao
 
-import play.api.Play._
+import com.google.inject.Inject
 import play.api.libs.json._
 import play.modules.reactivemongo.ReactiveMongoApi
 import reactivemongo.bson.BSONDocument
@@ -16,9 +16,15 @@ trait CRUDService[E, ID] {
 
   def findByName(name: String): Future[Option[E]]
 
+  def findByName(name: String, count: Int): Future[List[E]]
+
   def findByNameRegEX(name: String): Future[List[BSONDocument]]
 
   def findByCriteria(criteria: Map[String, Any], limit: Int): Future[List[E]]
+
+  def findByCriteriaAndSort(criteria: Map[String, Any], sort: Map[String, Any], limit: Int): Future[List[E]]
+
+  def findAll: Future[List[E]]
 
   def findByCriteriaAndFields(criteria: Map[String, Any], fields: List[String]): Future[List[E]]
 
@@ -35,27 +41,25 @@ import reactivemongo.api._
 /**
   * Abstract {{CRUDService}} impl backed by JSONCollection
   */
-abstract class MongoCRUDService[E: Format, ID: Format](implicit identity: Identity[E, ID])
+abstract class MongoCRUDService[E: Format, ID: Format] @Inject()(val reactiveMongoApi: ReactiveMongoApi)(implicit identity: Identity[E, ID])
   extends CRUDService[E, ID] {
 
   import play.api.libs.concurrent.Execution.Implicits.defaultContext
   import play.modules.reactivemongo.json._
   import play.modules.reactivemongo.json.collection.JSONCollection
 
-  lazy val reactiveMongoApi = current.injector.instanceOf[ReactiveMongoApi]
+  //  lazy val reactiveMongoApi = current.injector.instanceOf[ReactiveMongoApi]
 
   /** Mongo collection deserializable to [E] */
-  def collection: JSONCollection = reactiveMongoApi.db.collection(identity.name)
+  def collection: JSONCollection = reactiveMongoApi.db.collection(identity.entityName)
 
-  override def findById(id: ID): Future[Option[E]] = collection.find(Json.obj(identity.name -> id)).one[E]
+  override def findById(id: ID): Future[Option[E]] = collection.find(Json.obj(identity.entityName -> id)).one[E]
 
-
-  //  override def findByUUID(id: String): Future[Option[E]] = collection.find(Json.obj("uuid" -> id)).one[E]
-
-
-  override def findByUUID(id: String): Future[Option[E]] = collection.find(Json.obj("uuid" -> id)).one[E]
+  override def findByUUID(id: String): Future[Option[E]] = collection.find(Json.obj("id" -> id)).one[E]
 
   override def findByName(name: String): Future[Option[E]] = collection.find(Json.obj("name" -> name)).one[E]
+
+  override def findByName(name: String, count: Int): Future[List[E]] = findByCriteria(Map("name" -> name), count)
 
 
   override def findByNameRegEX(name: String): Future[List[BSONDocument]] = collection.find(Json.obj("name" -> Json.obj("$regex" -> name)))
@@ -68,17 +72,17 @@ abstract class MongoCRUDService[E: Format, ID: Format](implicit identity: Identi
   protected def findByCritAndFields(criteria: Map[String, Any], fields: List[String]): Future[List[BSONDocument]] = {
     val filter = JsObject(fields.map(_ -> JsNumber(1)).toSeq)
     collection.genericQueryBuilder.query(CriteriaJSONWriter.writes(criteria)).projection(filter)
-        .sort(Json.obj("time" -> -1))
+      .sort(Json.obj("time" -> -1))
       .cursor[BSONDocument](readPreference = ReadPreference.primary)
       .collect[List](50)
   }
 
+  def findByCriteriaAndSort(criteria: Map[String, Any], sort: Map[String, Any], limit: Int): Future[List[E]] = {
+    collection.genericQueryBuilder.query(CriteriaJSONWriter.writes(criteria)).sort(CriteriaJSONWriter.writes(sort))
+      .cursor[E](readPreference = ReadPreference.primary).collect[List](limit)
+  }
+
   private def findByCriteria(criteria: JsObject, limit: Int): Future[List[E]] = {
-    //    val filter = BSONDocument(
-    //      "uuid" -> 1,
-    //      "name" -> 1,
-    //      "time" -> 1)
-    //
     collection.
       find(criteria).
       sort(JsObject(Seq("time" -> JsNumber(-1)))).
@@ -92,57 +96,38 @@ abstract class MongoCRUDService[E: Format, ID: Format](implicit identity: Identi
     }
   }
 
-  /*
-    override def create(entity: E): Future[Either[String, ID]] = {
-      findByCriteria(Json.toJson(identity.clear(entity)).as[JsObject], 1).flatMap {
-        case t if t.size > 0 =>
-          Future.successful(Right(identity.of(t.head).get)) // let's be idempotent
-        case _ => {
-          val id = identity.next
-          val doc = Json.toJson(identity.set(entity, id)).as[JsObject]
-          collection.
-            insert(doc).
-            map {
-              case le if le.ok == true => Right(id)
-              case le => Left(le.message)
-            }
-        }
-      }
-    }
-  */
-
   override def create(entity: E): Future[Either[String, ID]] = {
     val id = identity.next
+    //    val doc = Json.toJson(entity).as[JsObject]
     val doc = Json.toJson(identity.set(entity, id)).as[JsObject]
-    collection.
-      insert(doc).
-      map {
-        case le if le.ok == true => Right(id)
-        case le => Left(le.message)
-      }
+    collection.insert(doc).map {
+      case le if le.ok == true => Right(id)
+      case le => Left(le.message)
+    }
   }
-
-  /*
-  override def create(entity: E): Future[Either[String, ID]] = Future {
-    Right(identity.next)
-  }
-  */
-
 
   override def update(id: ID, entity: E): Future[Either[String, ID]] = {
     val doc = Json.toJson(identity.set(entity, id)).as[JsObject]
-    collection.update(Json.obj(identity.name -> id), doc) map {
+    collection.update(Json.obj(identity.entityName -> id), doc) map {
       case le if le.ok == true => Right(id)
       case le => Left(le.message)
     }
   }
 
   override def delete(id: ID): Future[Either[String, ID]] = {
-    collection.remove(Json.obj(identity.name -> id)) map {
+    collection.remove(Json.obj(identity.entityName -> id)) map {
       case le if le.ok == true => Right(id)
       case le => Left(le.message)
     }
   }
+
+  override def findAll: Future[List[E]] = {
+    collection.find(Json.obj()).sort(Json.obj("buildNo" -> 1))
+      .cursor[E](readPreference = ReadPreference.primary).collect[List]()
+  }
+
+  override def findByCriteriaAndFields(criteria: Map[String, Any], fields: List[String]): Future[List[E]] = ???
+
 }
 
 object CriteriaJSONWriter extends Writes[Map[String, Any]] {

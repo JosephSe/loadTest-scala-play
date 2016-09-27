@@ -4,7 +4,8 @@ import java.util.UUID
 
 import com.google.inject.{ImplementedBy, Inject}
 import dao.{CRUDService, MongoCRUDService}
-import model.{MongoEntity, XmlFile, ZipFile}
+import model.{AsyncServerEntity, MongoEntity, XmlFile, ZipFile}
+import play.modules.reactivemongo.ReactiveMongoApi
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -15,7 +16,10 @@ import scala.concurrent.Future
 @ImplementedBy(classOf[XmlMongoService])
 trait XmlService extends CRUDService[XmlFile, UUID]
 
-class XmlMongoService extends MongoCRUDService[XmlFile, UUID] with XmlService {
+class XmlMongoService @Inject()(val reactiveMongo: ReactiveMongoApi) extends MongoCRUDService[XmlFile, UUID](reactiveMongo) with XmlService {
+  import play.api.Play._
+
+//  implicit val reactiveMongoApi = current.injector.instanceOf[ReactiveMongoApi]
 
   override def findByCriteriaAndFields(criteria: Map[String, Any], fields: List[String]): Future[List[XmlFile]] = {
     super.findByCritAndFields(criteria, fields).map(_.map(new XmlFile(_)))
@@ -25,7 +29,7 @@ class XmlMongoService extends MongoCRUDService[XmlFile, UUID] with XmlService {
 @ImplementedBy(classOf[ZipMongoService])
 trait ZipService extends CRUDService[ZipFile, UUID]
 
-class ZipMongoService extends MongoCRUDService[ZipFile, UUID] with ZipService {
+class ZipMongoService @Inject()(val reactiveMongo: ReactiveMongoApi) extends MongoCRUDService[ZipFile, UUID](reactiveMongo) with ZipService {
 
   override def findByCriteriaAndFields(criteria: Map[String, Any], fields: List[String]): Future[List[ZipFile]] = {
     super.findByCritAndFields(criteria, fields).map(_.map(new ZipFile(_)))
@@ -35,7 +39,7 @@ class ZipMongoService extends MongoCRUDService[ZipFile, UUID] with ZipService {
 
 class FileService @Inject()(xmlService: XmlService, zipService: ZipService) {
 
-  def findByNameAndId(name: String, id: String): Future[Option[MongoEntity]] = {
+  def findByNameAndId(name: String, id: String): Future[Option[AsyncServerEntity]] = {
     name match {
       case xml if name.endsWith("xml") => xmlService.findByUUID(id)
       case zip if name.endsWith("zip") => zipService.findByUUID(id)
@@ -52,7 +56,7 @@ class FileService @Inject()(xmlService: XmlService, zipService: ZipService) {
     * @param id
     * @return
     */
-  def loadById(typ: String, id: String): Future[Option[MongoEntity]] = {
+  def loadById(typ: String, id: String): Future[Option[AsyncServerEntity]] = {
     typ match {
       case "xml" => xmlService.findByUUID(id)
       case "zip" => zipService.findByUUID(id)
@@ -67,7 +71,7 @@ class FileService @Inject()(xmlService: XmlService, zipService: ZipService) {
     * @param name
     * @return
     */
-  def loadByName(name: String): Future[Option[MongoEntity]] = {
+  def loadByName(name: String): Future[Option[AsyncServerEntity]] = {
     if (name.contains(".")) {
       val n = name.substring(0, name.indexOf("."))
       name match {
@@ -82,7 +86,7 @@ class FileService @Inject()(xmlService: XmlService, zipService: ZipService) {
     }
   }
 
-  def create(entity: MongoEntity): Future[Either[String, MongoEntity]] = {
+  def create(entity: AsyncServerEntity): Future[Either[String, AsyncServerEntity]] = {
     val service = entity match {
       case xml: XmlFile => xmlService
       case zip: ZipFile => zipService

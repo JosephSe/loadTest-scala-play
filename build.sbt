@@ -1,6 +1,6 @@
 name := """async-server-scala"""
 
-version := "2.0.2-SNAPSHOT"
+version := "2.0.3-SNAPSHOT"
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala).enablePlugins(SbtWeb)
 
@@ -22,6 +22,8 @@ libraryDependencies ++= Seq(
   //SocksJS
   "org.scalamock" %% "scalamock-scalatest-support" % "3.2" % "test",
   "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.0" % "test",
+  // https://mvnrepository.com/artifact/org.mockito/mockito-core
+  "org.mockito" % "mockito-core" % "1.8.5",
   //  Conflict resolution
   "org.apache.httpcomponents" % "httpclient" % "4.3.4" exclude("commons-logging", "commons-logging"),
   "com.google.guava" % "guava" % "18.0",
@@ -30,13 +32,17 @@ libraryDependencies ++= Seq(
   //  "commons-logging" % "commons-logging" % "1.1.3",
   "org.scala-lang.modules" % "scala-parser-combinators_2.11" % "1.0.4",
   "org.scala-lang.modules" % "scala-xml_2.11" % "1.0.4",
-  "javax.mail" % "mail" % "1.4"
+  "javax.mail" % "mail" % "1.4",
   //  "io.swagger" %% "swagger-play2" % "1.5.1"
+  "com.evojam" %% "play-elastic4s" % "0.3.1"
 )
 
 libraryDependencies += filters
 
 resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"
+
+// Workaround of https://github.com/sbt/sbt/issues/2054:
+resolvers += Resolver.url("Typesafe Ivy releases", url("https://repo.typesafe.com/typesafe/ivy-releases"))(Resolver.ivyStylePatterns)
 
 scalacOptions += "-Ylog-classpath"
 
@@ -56,7 +62,7 @@ javaOptions in Test += "-Dconfig.file=conf/application.test.conf"
 
 javaOptions in run += "-Xmx4G"
 
-fork in run := true
+//fork in run := true
 
 assemblyMergeStrategy in assembly := {
   //  case PathList("javax", "servlet", xs@_*) => MergeStrategy.first
@@ -72,3 +78,5 @@ assemblyMergeStrategy in assembly := {
     val oldStrategy = (assemblyMergeStrategy in assembly).value
     oldStrategy(x)
 }
+
+//pipelineStages := Seq(rjs, uglify, digest, gzip)

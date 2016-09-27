@@ -15,7 +15,7 @@ import scala.concurrent.duration._
  * Created by Joseph Sebastian on 13/11/2015.
  */
 @Singleton
-class LoadTestService() {
+class LoadTestService @Inject() (fileUtil: FileUtil) {
 
   implicit val timeout = Timeout(5 seconds)
 
@@ -33,7 +33,7 @@ class LoadTestService() {
   def run = {
     val path = Play.resource(inputFile).get
     val fileStream = Play.resourceAsStream(inputFile).get
-    val rows = FileUtil.loadFile(Play.resourceAsStream(inputFile).get)
+    val rows = fileUtil.loadFile(Play.resourceAsStream(inputFile).get)
     loadTestRunner ! rows
     s"${rows.contentList.size} processed"
   }

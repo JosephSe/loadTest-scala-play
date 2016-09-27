@@ -5,6 +5,9 @@ import javax.inject.Inject
 import play.api.Logger
 import play.api.libs.json.Json
 import java.io._
+import java.util.UUID
+
+import model.AsyncServerEntity
 
 import scala.util.Random
 
@@ -60,16 +63,16 @@ class AsyncController @Inject()(val responseService: ResponseService, messageBro
     }
   }
 
-  private def save(entity: MongoEntity, typ: String): Future[Result] = {
+  private def save(entity: AsyncServerEntity, typ: String): Future[Result] = {
     responseService.saveFile(entity).map {
       case Right(mEntity) =>
         broadcast(mEntity)
-        Created(mEntity.uuid.get.toString)
+        Created(mEntity.id.get.toString)
       case Left(left) => BadRequest(left)
     }
   }
 
-  private def broadcast(file: MongoEntity) = {
+  private def broadcast(file: AsyncServerEntity) = {
     file match {
       case xml: XmlFile => messageBroadcaster.broadcast(Json.toJson(new ResponseData(xml).withNew.withoutData))
       case zip: ZipFile => messageBroadcaster.broadcast(Json.toJson(new ResponseData(zip).withNew.withoutData))

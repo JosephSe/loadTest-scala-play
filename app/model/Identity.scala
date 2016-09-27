@@ -5,7 +5,7 @@ package model
   */
 trait Identity[E, ID] {
 
-  def name: String
+  def entityName: String
 
   def of(entity: E): Option[ID]
 

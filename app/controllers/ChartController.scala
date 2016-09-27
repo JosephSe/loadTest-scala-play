@@ -12,9 +12,9 @@ class ChartController extends Controller{
 
   def pie = Action {
     var responseList = ListBuffer[ChartData]()
-    responseList += ChartData("Price", "100", "52.0", "8", "10", "3", "6", "12", "25")
-    responseList += ChartData("Hotels", "10", "52.0", "8", "10", "3", "6", "12", "25")
-    responseList += ChartData("Rooms", "20", "52.0", "8", "10", "3", "6", "12", "25")
+    responseList += new ChartData("Price", "100", "52.0", "8", "10", "3", "6")
+    responseList +=new  ChartData("Hotels", "10", "52.0", "8", "10", "3", "6")
+    responseList += new ChartData("Rooms", "20", "52.0", "8", "10", "3", "6")
     Ok(Json.toJson(responseList))
   }
 

@@ -22,11 +22,18 @@ GET     /prod                   controllers.ProdController.prodView
 # Jenkins
 GET     /jenkins                   controllers.JenkinsController.jenkins
 GET     /messages                   controllers.JenkinsController.messages
+GET     /jenkins/loadToDB                   controllers.JenkinsController.loadAllToDB(env:String ?= "prod")
 GET     /jenkins/job/all                   controllers.JenkinsController.allJobDetails
+GET     /jenkins/job/status                   controllers.JenkinsController.latestJobStatus(env:String ?= "prod", clearText:String ?= "HTMLFO_,_Prod")
 GET     /jenkins/job/:name                   controllers.JenkinsController.jobDetails(name:String)
 GET     /jenkins/job/history/all                   controllers.JenkinsController.allJobHistory(env:String ?= "prod")
 GET     /jenkins/job/history/count                   controllers.JenkinsController.jobHistoryStatusCount(env:String ?= "prod", clearText:String ?= "HTMLFO_,_Prod")
+GET     /jenkins/job/history/summary                   controllers.JenkinsController.allJobSummary(env:String ?= "prod", clearText:String ?= "HTMLFO_,_Prod")
+GET     /jenkins/job/history/summaryPerDay                   controllers.JenkinsController.allJobSummaryPerDay(env:String ?= "prod")
 GET     /jenkins/job/history/:name                   controllers.JenkinsController.jobHistory(name:String)
+
+# ES prod
+GET     /es/summary/:date                   controllers.ESController.summary(date:String)
 
 # Map static resources from the /public folder to the /assets URL path
 #GET  /assets/*file  @controllers.ExternalAssets.at(path = "/public", file)
@@ -44,6 +51,13 @@ GET     /file/download/:typ/:id        controllers.FileController.downloadFile(t
 
 # Response
 GET     /response/all                   controllers.ResponseController.all(namePrefix:String)
+
+# DataComparison
+GET     /dataComparison                   controllers.JiraController.dataComparisonDashboard
+GET     /comp/chart/pie                   controllers.DataComparisonController.getChartData
+
+# Jira
+GET     /jira/filter/:filterId/tickets                   controllers.JiraController.ticketsFromFilter(filterId:Long)
 
 # Booking
 POST     /booking                   controllers.AsyncController.booking

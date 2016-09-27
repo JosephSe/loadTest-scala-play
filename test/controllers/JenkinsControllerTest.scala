@@ -2,18 +2,8 @@ package controllers
 
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{FlatSpec, Matchers}
-import play.api.cache.{CacheApi, Cached}
 import play.api.mvc.Results
-import play.api.test.{FakeRequest, PlaySpecification, WithApplication}
-import service.JenkinsService
-
-import scala.concurrent.Future
-
-import org.scalatestplus.play._
-
-import play.api.mvc._
-import play.api.test._
-import play.api.test.Helpers._
+import service._
 
 /**
   * Created by Joseph Sebastian on 19/07/2016.

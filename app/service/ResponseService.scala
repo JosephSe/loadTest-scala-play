@@ -4,7 +4,7 @@ import java.util.UUID
 import javax.inject.Inject
 
 import com.google.inject.ImplementedBy
-import model.{MongoEntity, ResponseData}
+import model.{AsyncServerEntity, MongoEntity, ResponseData}
 import play.api.Play.current
 import play.api.libs.json.{JsString, Json}
 import play.modules.reactivemongo.ReactiveMongoApi
@@ -19,7 +19,7 @@ import scala.concurrent.Future
 trait ResponseService {
   def all(filePrefix: String): Future[Map[String, List[ResponseData]]]
 
-  def saveFile(file: MongoEntity): Future[Either[String, MongoEntity]]
+  def saveFile(file: AsyncServerEntity): Future[Either[String, AsyncServerEntity]]
 }
 
 class ResponseServiceImpl @Inject()(val xmlService: XmlService, val zipService: ZipService, fileService: FileService) extends ResponseService {
@@ -41,7 +41,7 @@ class ResponseServiceImpl @Inject()(val xmlService: XmlService, val zipService: 
     }
   }
 
-  override def saveFile(file: MongoEntity): Future[Either[String, MongoEntity]] = {
+  override def saveFile(file: AsyncServerEntity): Future[Either[String, AsyncServerEntity]] = {
     fileService.create(file)
   }
 }

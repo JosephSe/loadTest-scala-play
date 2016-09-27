@@ -1,36 +1,40 @@
-var app = angular.module('StarterApp', ['chart.js', 'datatables']);
+var app = angular.module('StarterApp', ['ngMaterial', 'chart.js', 'datatables']);
 
 app.controller('AppCtrl', ['$rootScope', '$scope', '$http', '$interval', function ($rootScope, $scope, $http, $interval) {
     $scope.isCollapsed = true;
     $scope.dataLoading = true;
     $scope.charts = ['Pie'];
     $scope.chartDataHotel = {
-        labels: ["Hotels Matching", "Nova > Legacy", "Legacy > Nova", "Zero Hotels returned"],
+        labels: ["Matching", "Nova > Legacy", "Legacy > Nova"],
         data: {},
         pieData:[]
     };
     $scope.chartDataPrice = {
-         labels: ["Prices Matching", "Nova > Legacy", "Legacy > Nova", "Prices NA"],
+         labels: ["Matching", "Nova > Legacy", "Legacy > Nova"],
         data: {},
         pieData:[]
     };
-    $scope.chartDataRoom = {
-        labels: ["Rooms Matching", "Nova > Legacy", "Legacy > Nova", "Zero Rooms returned"],
-        data: {},
-        pieData:[]
-    };
+    $scope.tickets = [];
 
-    $scope.initChart = function() {
+    $scope.getTickets = function () {
+        $http({
+          method: 'GET',
+          url: '/jira/filter/19366/tickets'
+        }).then(function successCallback(response) {
+            var vm = this;
+           $scope.tickets = response.data;
+          }, function errorCallback(response) {
+         });
+    }
+
+    $scope.loadChart = function() {
         $scope.dataLoading = true;
         $http({
           method: 'GET',
-          url: '/chart/pie'
+          url: '/comp/chart/pie'
         }).then(function successCallback(response) {
             $scope.dataLoading = false;
             loadData(response.data);
-            $('#dataTables-prices').DataTable({
-            responsive: true
-            });
           }, function errorCallback(response) {
           });
       }
@@ -43,23 +47,21 @@ app.controller('AppCtrl', ['$rootScope', '$scope', '$http', '$interval', functio
             } else if(value.typ == "Hotels") {
                 $scope.chartDataHotel.data = value;
                 $scope.chartDataHotel.pieData = getData(value);
-            } else if (value.typ =="Rooms") {
-                $scope.chartDataRoom.data = value;
-                $scope.chartDataRoom.pieData = getData(value);
             }
           })
       }
       function getData(values) {
         var dataArrays = [];
-        dataArrays.push(values.bothSame);
-        dataArrays.push(values.nova);
-        dataArrays.push(values.legacy);
-        dataArrays.push(values.bothZeroHotels);
+        dataArrays.push(values.bothSamePct);
+        dataArrays.push(values.novaPct);
+        dataArrays.push(values.legacyPct);
         return dataArrays;
       }
 
     }
     ])
+    .controller('JiraTicketController', ['$http', 'datatables'], function($http, datatables) {
+    })
     .config(function (ChartJsProvider) {
         // Configure all charts
         ChartJsProvider.setOptions({
@@ -67,6 +69,11 @@ app.controller('AppCtrl', ['$rootScope', '$scope', '$http', '$interval', functio
             responsive: true
         });
         // Configure all doughnut charts
+    })
+    .config(function ($mdThemingProvider) {
+        $mdThemingProvider.theme('default')
+            .primaryPalette('blue-grey')
+            .accentPalette('orange');
     });
 
 function comparisonData(){
